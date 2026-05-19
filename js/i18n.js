@@ -119,12 +119,11 @@
     },
   };
 
-  /** Текущий язык. Приоритет: localStorage → navigator.language → 'ru'. */
+  /** Текущий язык. Приоритет: localStorage → 'ru' по умолчанию.
+   *  navigator.language НЕ используется — target user в РФ, дефолт всегда RU. */
   function currentLang() {
     const saved = localStorage.getItem('lang');
     if (saved && STRINGS[saved]) return saved;
-    const nav = (navigator.language || '').slice(0, 2);
-    if (STRINGS[nav]) return nav;
     return 'ru';
   }
 
