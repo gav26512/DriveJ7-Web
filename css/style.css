@@ -590,16 +590,12 @@ body.profile-tiggo9 .hvac-btn.active { background: rgba(255, 154, 77, 0.10); }
   opacity: 0.4;
 }
 
+/* Точки уровня горят в цвет акцента (тот же что у border/иконки активной кнопки). */
 .level-dots[data-level="1"] span:nth-child(1),
-.level-dots[data-level="2"] span:nth-child(1),
-.level-dots[data-level="2"] span:nth-child(2),
+.level-dots[data-level="2"] span:nth-child(-n+2),
 .level-dots[data-level="3"] span {
-  background: var(--accent-warm);
+  background: var(--accent);
   opacity: 1;
-}
-
-.hvac-btn.active .level-dots span {
-  background: var(--bg);
 }
 
 /* Fan + memory строкой (горизонтально под HVAC-сеткой) */
