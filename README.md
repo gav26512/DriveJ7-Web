@@ -70,11 +70,6 @@ DriveJ7-Web/
 [`JCarTools/core_manifest`](https://github.com/JCarTools/core_manifest) для документации
 API.
 
-## Перенос с нативного DriveJ7
-
-Старый нативный лаунчер: `gav26512/Launcer-Jaecoo-j7` (приватный). Web-edition
-заменяет его постепенно — пока обкатываем web, нативный остаётся рабочим.
-
 ## Лицензия
 
 MIT
