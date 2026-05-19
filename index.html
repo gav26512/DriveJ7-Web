@@ -127,13 +127,6 @@
         <button id="settings-close" class="icon-btn" aria-label="close">✕</button>
       </header>
       <div class="settings-row">
-        <label data-i18n="settings.theme">Тема</label>
-        <select id="setting-theme">
-          <option value="dark" data-i18n="settings.theme_dark">Тёмная</option>
-          <option value="light" data-i18n="settings.theme_light">Светлая</option>
-        </select>
-      </div>
-      <div class="settings-row">
         <label data-i18n="settings.language">Язык</label>
         <select id="setting-lang">
           <option value="ru">Русский</option>
@@ -161,6 +154,30 @@
           <!-- options заполняются JS-ом из playerDetect.detectInstalled() -->
         </select>
       </div>
+
+      <div class="settings-section">Плавающие виджеты</div>
+      <div class="settings-row">
+        <label for="cfg-w-dt">Дата и время</label>
+        <input type="checkbox" id="cfg-w-dt" checked>
+      </div>
+      <div class="settings-row">
+        <label for="cfg-w-temp">T за бортом</label>
+        <input type="checkbox" id="cfg-w-temp" checked>
+      </div>
+
+      <div class="settings-section">Кнопки климата</div>
+      <div class="settings-row">
+        <label for="cfg-two-zone">Двухзонный климат (T пасс.)</label>
+        <input type="checkbox" id="cfg-two-zone" checked>
+      </div>
+      <div class="settings-row">
+        <label for="cfg-mem2">В2 — память сидений</label>
+        <input type="checkbox" id="cfg-mem2" checked>
+      </div>
+      <div class="settings-row">
+        <label for="cfg-mem3">В3 — память сидений</label>
+        <input type="checkbox" id="cfg-mem3" checked>
+      </div>
       <div class="settings-row about" data-i18n="settings.about">О приложении</div>
       <div class="about-text">Drive J7 web · v0.2.0 · gav26512/DriveJ7-Web</div>
     </div>
@@ -169,6 +186,7 @@
   <!-- ============================== Scripts -->
   <script src="js/api.js"></script>
   <script src="js/i18n.js"></script>
+  <script src="js/config.js"></script>
   <script src="js/profiles/generic.js"></script>
   <script src="js/profiles/j7.js"></script>
   <script src="js/profiles/j8.js"></script>

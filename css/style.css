@@ -20,16 +20,6 @@
   --art-size: 232px;     /* почти во всю высоту проигрывателя (player-h − padding 2×8) */
 }
 
-body.theme-light {
-  --bg: #F2EFF6;
-  --surface: rgba(255, 255, 255, 0.85);
-  --surface-2: rgba(228, 224, 235, 0.85);
-  --surface-active: rgba(108, 200, 255, 0.25);
-  --text: #1A1A1F;
-  --text-dim: #5A5363;
-  --border: rgba(0, 0, 0, 0.08);
-}
-
 * {
   box-sizing: border-box;
   margin: 0;
@@ -723,18 +713,23 @@ body.profile-tiggo9 .hvac-btn.active { background: rgba(255, 154, 77, 0.10); }
 }
 
 .overlay-content {
-  width: min(560px, 90%);
-  max-height: 80vh;
+  width: 100%;
+  height: 100%;
+  max-width: 100vw;
+  max-height: 100vh;
   overflow-y: auto;
-  background: var(--surface);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-card);
-  padding: 24px;
+  background: var(--bg);
+  border: none;
+  border-radius: 0;
+  padding: 32px 48px;
   display: flex;
   flex-direction: column;
   gap: 16px;
+}
+
+/* Settings overlay — фон не размытый, чтобы видна была раскладка под ним. */
+#settings-overlay {
+  background: rgba(0, 0, 0, 0.92);
 }
 
 .overlay-header {
@@ -792,6 +787,23 @@ body.profile-tiggo9 .hvac-btn.active { background: rgba(255, 154, 77, 0.10); }
   letter-spacing: 0.6px;
   padding-top: 12px;
   border-top: 1px solid var(--border);
+}
+
+.settings-section {
+  font-size: 11px;
+  color: var(--text-dim);
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  padding-top: 8px;
+  border-top: 1px solid var(--border);
+  margin-top: 4px;
+}
+
+.settings-row input[type="checkbox"] {
+  width: 20px;
+  height: 20px;
+  accent-color: var(--accent);
+  cursor: pointer;
 }
 
 .about-text {

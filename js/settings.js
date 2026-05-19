@@ -5,7 +5,6 @@
   const overlay = document.getElementById('settings-overlay');
   const closeBtn = document.getElementById('settings-close');
 
-  const themeSelect = document.getElementById('setting-theme');
   const langSelect = document.getElementById('setting-lang');
   const brightInput = document.getElementById('setting-brightness');
 
@@ -14,28 +13,23 @@
   // Open-кнопка живёт в climate-strip (#btn-config) — wire'ится в climate.js.
   // Здесь обрабатываем только close и клик по фону overlay.
   closeBtn?.addEventListener('click', close);
-  overlay?.addEventListener('click', (e) => {
-    if (e.target === overlay) close();
-  });
 
-  // ============================== Theme
-  const savedTheme = localStorage.getItem('theme') || 'dark';
-  applyTheme(savedTheme);
-  themeSelect.value = savedTheme;
-  themeSelect.addEventListener('change', () => {
-    applyTheme(themeSelect.value);
-    localStorage.setItem('theme', themeSelect.value);
-  });
-
-  function applyTheme(theme) {
-    document.body.classList.remove('theme-dark', 'theme-light');
-    document.body.classList.add(theme === 'light' ? 'theme-light' : 'theme-dark');
+  // ============================== Widget visibility + climate config checkboxes
+  const cfgCheckboxes = [
+    { id: 'cfg-w-dt',    key: 'widgetDateTime' },
+    { id: 'cfg-w-temp',  key: 'widgetOutdoorT' },
+    { id: 'cfg-two-zone', key: 'twoZoneClimate' },
+    { id: 'cfg-mem2',    key: 'memorySlot2' },
+    { id: 'cfg-mem3',    key: 'memorySlot3' },
+  ];
+  for (const cb of cfgCheckboxes) {
+    const el = document.getElementById(cb.id);
+    if (!el) continue;
+    el.checked = !!window.config?.[cb.key];
+    el.addEventListener('change', () => {
+      window.configApi?.set(cb.key, el.checked);
+    });
   }
-
-  // Подписка на theme от хоста (приоритет над user choice если хост явно прислал).
-  api.on('theme', (data) => {
-    if (data?.mode) applyTheme(data.mode);
-  });
 
   // ============================== Language
   langSelect.value = i18n.getLang();
