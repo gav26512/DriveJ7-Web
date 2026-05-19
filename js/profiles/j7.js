@@ -10,7 +10,8 @@
     id: 'j7',
     name: 'Jaecoo J7',
     bodyClass: 'profile-j7',
-    fuelTankLiters: 51,  // FWD по умолчанию; AWD 57 — задаётся в settings вручную
+    // По решению юзера: fuel/coolant виджеты не делаем.
+    fuelTankLiters: null,
     hvac: {
       auto: true,
       ac: true,
@@ -27,8 +28,8 @@
       speed: true,
       outdoor_temp: true,
       battery: true,
-      fuel: true,         // J7 — fuel-виджет в литрах
-      coolant: true,      // J7 — T coolant если хост даёт (по запросу к автору JCarTools)
+      fuel: false,
+      coolant: false,
     },
     layout: 'portrait',
     enumOverrides: {

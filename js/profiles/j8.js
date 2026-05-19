@@ -10,7 +10,7 @@
     id: 'j8',
     name: 'Jaecoo J8',
     bodyClass: 'profile-j8',
-    fuelTankLiters: 70,  // TODO: уточнить точный объём бака J8
+    fuelTankLiters: null,
     hvac: {
       auto: true,
       ac: true,

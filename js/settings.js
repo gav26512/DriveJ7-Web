@@ -55,6 +55,50 @@
   applyI18nAttributes();
   window.addEventListener('langChanged', applyI18nAttributes);
 
+  // ============================== Player auto-launch
+  const playerSelect = document.getElementById('setting-player');
+  function reloadPlayerOptions() {
+    if (!playerSelect) return;
+    const detected = window.playerDetect?.detectInstalled() || [];
+    const saved = window.playerDetect?.getSelected() || '';
+    playerSelect.innerHTML = '<option value="">Не выбран</option>';
+    for (const p of detected) {
+      const opt = document.createElement('option');
+      opt.value = p.package;
+      opt.textContent = p.label;
+      if (p.package === saved) opt.selected = true;
+      playerSelect.appendChild(opt);
+    }
+    if (detected.length === 0) {
+      // Если ничего не нашли — оставляем заглушку.
+      const opt = document.createElement('option');
+      opt.value = '';
+      opt.textContent = '(музыкальные приложения не найдены)';
+      opt.disabled = true;
+      playerSelect.appendChild(opt);
+    }
+  }
+  reloadPlayerOptions();
+  playerSelect?.addEventListener('change', () => {
+    window.playerDetect?.setSelected(playerSelect.value);
+  });
+
+  // ============================== Profile (car model)
+  const profileSelect = document.getElementById('setting-profile');
+  if (profileSelect) {
+    const savedProfile = localStorage.getItem('profile') || 'auto';
+    profileSelect.value = savedProfile;
+    profileSelect.addEventListener('change', () => {
+      if (profileSelect.value === 'auto') {
+        localStorage.removeItem('profile');
+      } else {
+        localStorage.setItem('profile', profileSelect.value);
+      }
+      // Перезагружаем чтобы профиль применился к layout/cssVars.
+      location.reload();
+    });
+  }
+
   // ============================== Brightness
   const savedBright = parseInt(localStorage.getItem('brightness') || '80', 10);
   brightInput.value = savedBright;

@@ -20,4 +20,10 @@
     api.onJsReady();
     console.info('[core] onJsReady fired, profile:', window.profile?.id);
   }, 50);
+
+  // Auto-launch выбранного плеера через 1.5 сек после старта — даёт хосту время
+  // прислать musicInfo с уже играющим треком (если что-то уже играет).
+  setTimeout(() => {
+    window.playerDetect?.autoLaunchIfConfigured();
+  }, 1500);
 })();

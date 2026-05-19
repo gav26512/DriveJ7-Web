@@ -1,25 +1,32 @@
-/* Drive J7 Web — стили. Dark по умолчанию, light переключается через body.theme-light. */
+/* Drive J7 Web — клон нативного интерфейса. Bing wallpaper фон, нижняя панель  */
+/* с app-grid + player + climate-strip. Floating overlay-info в углу.            */
 
 :root {
-  --bg: #0F0D13;
-  --surface: #1A171F;
-  --surface-2: #251F2D;
-  --text: #ECECEC;
-  --text-dim: #9A93A8;
+  --bg: #000000;
+  --surface: rgba(28, 28, 32, 0.85);
+  --surface-2: rgba(45, 45, 52, 0.85);
+  --surface-active: rgba(108, 200, 255, 0.20);
+  --text: #FFFFFF;
+  --text-dim: #BDBDBD;
   --accent: #6CC8FF;
   --accent-warm: #FFB55B;
-  --border: rgba(255, 255, 255, 0.06);
-  --radius: 16px;
-  --gap: 12px;
+  --border: rgba(255, 255, 255, 0.08);
+  --radius-card: 16px;
+  --radius-btn: 12px;
+  --gap: 8px;
+  --btn-size: 120px;
+  --player-h: 264px;     /* = 2 × btn-size + gap + 2×8 padding */
+  --strip-h: 248px;
 }
 
 body.theme-light {
   --bg: #F2EFF6;
-  --surface: #FFFFFF;
-  --surface-2: #ECE7F3;
+  --surface: rgba(255, 255, 255, 0.85);
+  --surface-2: rgba(228, 224, 235, 0.85);
+  --surface-active: rgba(108, 200, 255, 0.25);
   --text: #1A1A1F;
   --text-dim: #5A5363;
-  --border: rgba(0, 0, 0, 0.06);
+  --border: rgba(0, 0, 0, 0.08);
 }
 
 * {
@@ -34,7 +41,7 @@ html, body {
   background: var(--bg);
   color: var(--text);
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  font-size: 16px;
+  font-size: 14px;
   user-select: none;
   -webkit-user-select: none;
   overflow: hidden;
@@ -48,154 +55,220 @@ button {
   cursor: pointer;
 }
 
-/* ============================== Top bar */
-
-#topbar {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 16px 24px;
-  height: 72px;
+img {
+  display: block;
+  pointer-events: none;
+  -webkit-user-drag: none;
 }
 
-.topbar-left {
-  display: flex;
-  align-items: baseline;
-  gap: 14px;
+/* ============================== Wallpaper (Bing daily) */
+
+.wallpaper {
+  position: fixed;
+  inset: 0;
+  background-size: cover;
+  background-position: center;
+  z-index: -2;
 }
 
-.clock {
-  font-size: 36px;
-  font-weight: 700;
+.wallpaper::after {
+  /* Затемнение чтобы UI поверх читался */
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to bottom, rgba(0,0,0,0.0) 0%, rgba(0,0,0,0.4) 60%, rgba(0,0,0,0.7) 100%);
+}
+
+/* ============================== Overlay info (date/time, outdoor T, RPM) */
+/* В нативе это плавающие движимые виджеты — в web упрощаем: фиксированный угол */
+
+.overlay-info {
+  position: fixed;
+  top: 16px;
+  left: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  align-items: flex-start;
+  z-index: 10;
+}
+
+.ov-datetime {
+  background: rgba(255, 255, 255, 0.92);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border-radius: 14px;
+  padding: 10px 16px;
+  color: #1a1a1f;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25);
+}
+
+#ov-time {
+  font-size: 30px;
+  font-weight: 800;
   letter-spacing: -1px;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+  color: #1a1a1f;
 }
 
-.date {
-  font-size: 14px;
-  color: var(--text-dim);
+#ov-date {
+  margin-top: 2px;
+  font-size: 12px;
+  color: #5a5363;
 }
 
-.topbar-right {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-}
-
-.weather {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 18px;
-  color: var(--text-dim);
-}
-
-.weather-icon {
-  font-size: 22px;
-}
-
-.icon-btn {
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
+.ov-pill {
   background: var(--surface);
-  display: inline-flex;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border-radius: 22px;
+  padding: 10px 18px;
+  font-size: 16px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  border: 1px solid var(--border);
+}
+
+.ov-pill-unit {
+  font-size: 11px;
+  font-weight: 400;
+  color: var(--text-dim);
+  margin-left: 4px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* ============================== Bottom panel */
+
+#bottom-panel {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap);
+  z-index: 5;
+}
+
+.top-row {
+  display: flex;
+  gap: var(--gap);
+  align-items: flex-end;
+}
+
+/* ============================== App grid 2×3 (6 слотов) */
+
+.app-grid {
+  display: grid;
+  grid-template-columns: repeat(3, var(--btn-size));
+  grid-template-rows: repeat(2, var(--btn-size));
+  gap: var(--gap);
+  flex-shrink: 0;
+}
+
+.app-slot {
+  width: var(--btn-size);
+  height: var(--btn-size);
+  background: var(--surface);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-card);
+  display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
-  font-size: 18px;
-  transition: background .15s;
+  gap: 6px;
+  cursor: pointer;
+  transition: transform .12s, background .15s;
+  position: relative;
 }
 
-.icon-btn:active {
+.app-slot:active {
+  transform: scale(0.96);
   background: var(--surface-2);
 }
 
-/* ============================== Main grid */
-
-#main {
-  padding: 0 24px 24px 24px;
-  display: grid;
-  grid-template-rows: auto 1fr auto;
-  gap: var(--gap);
-  height: calc(100vh - 72px);
-}
-
-/* ============================== Widget row */
-
-.widgets {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: var(--gap);
-}
-
-.widget {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  padding: 16px;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  min-height: 88px;
-}
-
-.widget-value {
-  font-size: 32px;
-  font-weight: 600;
-  font-variant-numeric: tabular-nums;
-  color: var(--accent);
-}
-
-.widget[data-widget="outdoor"] .widget-value {
-  color: var(--accent-warm);
-}
-
-.widget-label {
-  margin-top: 4px;
-  font-size: 12px;
+.app-slot.empty {
+  border-style: dashed;
   color: var(--text-dim);
-  text-transform: uppercase;
-  letter-spacing: 0.6px;
 }
 
-/* ============================== Player + climate */
-
-#middle {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: var(--gap);
-  min-height: 0; /* чтоб grid сжимался */
+.app-slot-icon {
+  width: 54px;
+  height: 54px;
+  border-radius: 12px;
+  background: var(--surface-2);
+  background-size: cover;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 28px;
+  font-weight: 600;
 }
 
-.player {
+.app-slot-label {
+  font-size: 12px;
+  text-align: center;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  padding: 0 4px;
+}
+
+/* ============================== Player block (занимает остаток ширины) */
+
+.player-block {
+  flex: 1;
+  height: var(--player-h);
   background: var(--surface);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
   border: 1px solid var(--border);
-  border-radius: var(--radius);
-  padding: 18px;
+  border-radius: var(--radius-card);
+  padding: 14px 18px;
   display: grid;
-  grid-template-columns: 96px 1fr;
-  grid-template-rows: auto 1fr auto;
-  gap: 14px;
+  grid-template-columns: 112px 1fr auto;
+  grid-template-rows: auto auto 1fr auto;
+  grid-template-areas:
+    "art info  extras"
+    "art ctrls extras"
+    "art prog  extras"
+    "art prog  extras";
+  gap: 10px 14px;
   align-items: center;
 }
 
 .player-art {
-  grid-row: 1 / span 2;
-  width: 96px;
-  height: 96px;
+  grid-area: art;
+  width: 112px;
+  height: 112px;
   background: var(--surface-2);
-  border-radius: 12px;
+  border-radius: 14px;
   background-size: cover;
   background-position: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.player-art-placeholder {
+  font-size: 40px;
+  color: var(--text-dim);
 }
 
 .player-info {
-  align-self: flex-end;
+  grid-area: info;
   min-width: 0;
+  align-self: flex-end;
 }
 
 .player-title {
-  font-size: 16px;
+  font-size: 17px;
   font-weight: 600;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -203,37 +276,49 @@ button {
 }
 
 .player-artist {
-  margin-top: 2px;
   font-size: 13px;
   color: var(--text-dim);
+  margin-top: 2px;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
 .player-controls {
-  grid-column: 1 / -1;
+  grid-area: ctrls;
   display: flex;
-  justify-content: center;
-  gap: 24px;
-  font-size: 22px;
+  align-items: center;
+  gap: 16px;
 }
 
 .btn-media {
-  width: 44px;
-  height: 44px;
+  width: 42px;
+  height: 42px;
   border-radius: 50%;
   background: var(--surface-2);
-  transition: background .15s;
+  font-size: 18px;
+  transition: background .15s, transform .1s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .btn-media:active {
   background: var(--accent);
   color: var(--bg);
+  transform: scale(0.94);
+}
+
+.btn-media-play {
+  width: 52px;
+  height: 52px;
+  background: var(--accent);
+  color: var(--bg);
+  font-size: 20px;
 }
 
 .player-progress {
-  grid-column: 1 / -1;
+  grid-area: prog;
   display: flex;
   align-items: center;
   gap: 10px;
@@ -243,7 +328,7 @@ button {
 
 .player-bar {
   flex: 1;
-  height: 3px;
+  height: 4px;
   background: var(--surface-2);
   border-radius: 2px;
   overflow: hidden;
@@ -261,148 +346,354 @@ button {
   min-width: 36px;
 }
 
-/* ============================== Climate */
+.player-extras {
+  grid-area: extras;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  align-items: center;
+}
 
-.climate {
+.btn-bg {
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-btn);
+  background: var(--surface-2);
+  font-size: 18px;
+}
+
+.btn-bg:active {
+  background: var(--surface-active);
+}
+
+/* ============================== Climate strip */
+
+.climate-strip {
+  display: grid;
+  grid-template-columns: 96px 1fr 96px;
+  gap: var(--gap);
+  align-items: stretch;
+}
+
+.climate-center {
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap);
+}
+
+/* T-stepper (water-droplet style, vertical) */
+
+.t-stepper {
   background: var(--surface);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
   border: 1px solid var(--border);
-  border-radius: var(--radius);
-  padding: 18px;
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
-}
-
-.climate-row {
-  display: flex;
+  border-radius: var(--radius-card);
+  padding: 12px 8px;
+  display: grid;
+  grid-template-rows: 1fr auto 1fr;
   gap: 8px;
-  flex-wrap: wrap;
-}
-
-.hvac-btn {
-  flex: 1;
-  min-width: 64px;
-  height: 44px;
-  border-radius: 12px;
-  background: var(--surface-2);
-  color: var(--text-dim);
-  font-size: 14px;
-  transition: all .15s;
-}
-
-.hvac-btn.active {
-  background: var(--accent);
-  color: var(--bg);
-}
-
-.hvac-btn:active {
-  transform: scale(0.96);
-}
-
-.hvac-step {
-  flex: 1;
-  display: flex;
   align-items: center;
-  gap: 8px;
+  justify-items: center;
+}
+
+.t-step-btn {
+  width: 72px;
+  height: 64px;
+  border-radius: var(--radius-btn);
   background: var(--surface-2);
-  border-radius: 12px;
-  padding: 6px;
-  min-width: 0;
+  font-size: 28px;
+  font-weight: 300;
+  color: var(--accent);
+  transition: background .15s, transform .1s;
 }
 
-.step-btn {
-  width: 36px;
-  height: 36px;
-  border-radius: 8px;
-  background: var(--surface);
-  font-size: 20px;
-  font-weight: 600;
+.t-step-btn:active {
+  background: var(--surface-active);
+  transform: scale(0.94);
 }
 
-.step-btn:active {
-  background: var(--accent);
-  color: var(--bg);
+.t-value {
+  text-align: center;
 }
 
-.step-value {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  min-width: 0;
-}
-
-.step-label {
+.t-label {
   font-size: 10px;
   color: var(--text-dim);
+  letter-spacing: 1px;
   text-transform: uppercase;
-  letter-spacing: 0.4px;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  max-width: 100%;
 }
 
-.step-current {
-  font-size: 18px;
+.t-current {
+  font-size: 28px;
   font-weight: 600;
+  margin-top: 2px;
   font-variant-numeric: tabular-nums;
 }
 
-/* ============================== Apps */
+/* HVAC grid: 2 rows × 6 cols (12 кнопок) */
 
-.apps {
-  display: flex;
-  gap: 12px;
-  overflow-x: auto;
-  padding: 4px 0;
+.hvac-grid {
+  background: var(--surface);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-card);
+  padding: 10px;
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  grid-template-rows: 1fr 1fr;
+  gap: 8px;
 }
 
-.app-card {
-  min-width: 88px;
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  padding: 12px;
+/* Outline-стиль: полупрозрачный фон, тонкий border. При active border + иконка   */
+/* подсвечиваются одним цветом (accent). Без заливки.                            */
+
+.hvac-btn {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1.5px solid rgba(255, 255, 255, 0.15);
+  border-radius: var(--radius-btn);
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: center;
+  position: relative;
+  transition: border-color .15s, background .15s, transform .1s;
+  padding: 6px;
+}
+
+.hvac-btn:active {
+  transform: scale(0.94);
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.hvac-btn.active {
+  border-color: var(--accent);
+  background: rgba(108, 200, 255, 0.08);  /* лёгкая подсветка фона в цвет акцента */
+}
+
+body.profile-j7 .hvac-btn.active { background: rgba(255, 181, 91, 0.10); }
+body.profile-tiggo9 .hvac-btn.active { background: rgba(255, 154, 77, 0.10); }
+
+.hvac-btn.active img {
+  filter: var(--icon-active-filter, brightness(0) saturate(100%) invert(75%) sepia(50%) saturate(800%) hue-rotate(170deg) brightness(105%) contrast(95%));
+}
+
+.hvac-btn:disabled,
+.hvac-btn.disabled {
+  opacity: 0.35;
+  pointer-events: none;
+}
+
+/* Иконка как маска — background-color перекрашивает её. По умолчанию белая. */
+.hvac-icon {
+  width: 40px;
+  height: 40px;
+  background-color: rgba(255, 255, 255, 0.9);
+  -webkit-mask-position: center;
+  mask-position: center;
+  -webkit-mask-size: contain;
+  mask-size: contain;
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  transition: background-color .15s;
+}
+
+.hvac-btn.active .hvac-icon { background-color: var(--accent); }
+
+.hvac-icon[data-icon="auto"]          { -webkit-mask-image: url(../icons/ic_climate_auto.png);          mask-image: url(../icons/ic_climate_auto.png); }
+.hvac-icon[data-icon="recirc"]        { -webkit-mask-image: url(../icons/ic_climate_recirc.png);        mask-image: url(../icons/ic_climate_recirc.png); }
+.hvac-icon[data-icon="glass_front"]   { -webkit-mask-image: url(../icons/ic_climate_glass_front.png);   mask-image: url(../icons/ic_climate_glass_front.png); }
+.hvac-icon[data-icon="glass_rear"]    { -webkit-mask-image: url(../icons/ic_climate_glass_rear.png);    mask-image: url(../icons/ic_climate_glass_rear.png); }
+.hvac-icon[data-icon="steer"]         { -webkit-mask-image: url(../icons/ic_climate_steer.png);         mask-image: url(../icons/ic_climate_steer.png); }
+.hvac-icon[data-icon="seat_heat_drv"] { -webkit-mask-image: url(../icons/ic_climate_seat_heat_driver.png); mask-image: url(../icons/ic_climate_seat_heat_driver.png); }
+.hvac-icon[data-icon="seat_heat_pass"]{ -webkit-mask-image: url(../icons/ic_climate_seat_heat_pass.png); mask-image: url(../icons/ic_climate_seat_heat_pass.png); }
+.hvac-icon[data-icon="seat_vent_drv"] { -webkit-mask-image: url(../icons/ic_climate_seat_vent_driver.png); mask-image: url(../icons/ic_climate_seat_vent_driver.png); }
+.hvac-icon[data-icon="seat_vent_pass"]{ -webkit-mask-image: url(../icons/ic_climate_seat_vent_pass.png); mask-image: url(../icons/ic_climate_seat_vent_pass.png); }
+
+.hvac-text {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.hvac-btn.active .hvac-text {
+  color: var(--accent);
+}
+
+/* Drag-n-drop visual states */
+
+.hvac-btn.dnd-dragging {
+  opacity: 0.3;
+  border-style: dashed;
+}
+
+.dnd-ghost {
+  border-radius: var(--radius-btn);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+  background: rgba(255, 255, 255, 0.04);
+  border: 2px solid var(--accent);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.dnd-ghost .hvac-icon {
+  background-color: var(--accent);
+}
+
+.seat-badge {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  background: rgba(0, 0, 0, 0.55);
+  color: white;
+  font-size: 9px;
+  font-weight: 700;
+  padding: 2px 5px;
+  border-radius: 4px;
+  line-height: 1;
+}
+
+/* Уровни 0..3 — три точки внизу кнопки */
+
+.level-dots {
+  display: flex;
+  gap: 3px;
+  margin-top: 4px;
+}
+
+.level-dots span {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--text-dim);
+  opacity: 0.4;
+}
+
+.level-dots[data-level="1"] span:nth-child(1),
+.level-dots[data-level="2"] span:nth-child(1),
+.level-dots[data-level="2"] span:nth-child(2),
+.level-dots[data-level="3"] span {
+  background: var(--accent-warm);
+  opacity: 1;
+}
+
+.hvac-btn.active .level-dots span {
+  background: var(--bg);
+}
+
+/* Fan + memory строкой (горизонтально под HVAC-сеткой) */
+
+.fan-mem-row {
+  background: var(--surface);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-card);
+  padding: 8px 12px;
+  display: flex;
+  align-items: center;
   gap: 8px;
-  cursor: pointer;
-  transition: transform .12s;
 }
 
-.app-card:active {
-  transform: scale(0.96);
-}
-
-.app-icon {
-  width: 48px;
-  height: 48px;
-  border-radius: 12px;
-  background: var(--surface-2);
-  background-size: cover;
-}
-
-.app-label {
-  font-size: 12px;
+.fan-label {
+  font-size: 11px;
+  color: var(--text-dim);
+  letter-spacing: 0.8px;
+  font-weight: 600;
+  min-width: 28px;
   text-align: center;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  max-width: 80px;
 }
 
-/* ============================== Overlay (settings) */
+.fan-bar-inline {
+  flex: 1;
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  gap: 6px;
+  align-items: center;
+  height: 36px;
+}
+
+.fan-edge {
+  width: 32px;
+  height: 100%;
+  border-radius: var(--radius-btn);
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  font-size: 18px;
+  color: var(--accent);
+}
+
+.fan-edge:active {
+  background: rgba(255, 255, 255, 0.12);
+}
+
+.fan-segments {
+  display: flex;
+  gap: 3px;
+  height: 100%;
+  align-items: center;
+}
+
+.fan-segments span {
+  flex: 1;
+  height: 60%;
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 3px;
+  transition: background .12s;
+}
+
+.fan-segments[data-level="1"]  span:nth-child(-n+1),
+.fan-segments[data-level="2"]  span:nth-child(-n+2),
+.fan-segments[data-level="3"]  span:nth-child(-n+3),
+.fan-segments[data-level="4"]  span:nth-child(-n+4),
+.fan-segments[data-level="5"]  span:nth-child(-n+5),
+.fan-segments[data-level="6"]  span:nth-child(-n+6),
+.fan-segments[data-level="7"]  span:nth-child(-n+7),
+.fan-segments[data-level="8"]  span:nth-child(-n+8),
+.fan-segments[data-level="9"]  span:nth-child(-n+9),
+.fan-segments[data-level="10"] span {
+  background: var(--accent);
+}
+
+.mem-btn {
+  min-width: 44px;
+  height: 36px;
+  padding: 0 12px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1.5px solid rgba(255, 255, 255, 0.15);
+  border-radius: var(--radius-btn);
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text);
+  transition: border-color .12s, color .12s;
+}
+
+.mem-btn.active {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.mem-btn:active {
+  transform: scale(0.94);
+}
+
+.mem-btn.config {
+  font-size: 18px;
+  font-weight: 400;
+}
+
+/* ============================== Overlay dialogs */
 
 .overlay {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.5);
+  background: rgba(0, 0, 0, 0.55);
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 50;
+  z-index: 100;
 }
 
 .overlay.hidden {
@@ -410,9 +701,14 @@ button {
 }
 
 .overlay-content {
-  width: min(500px, 90%);
+  width: min(560px, 90%);
+  max-height: 80vh;
+  overflow-y: auto;
   background: var(--surface);
-  border-radius: var(--radius);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-card);
   padding: 24px;
   display: flex;
   flex-direction: column;
@@ -428,6 +724,21 @@ button {
 .overlay-header h2 {
   font-size: 20px;
   font-weight: 600;
+}
+
+.icon-btn {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: var(--surface-2);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+}
+
+.icon-btn:active {
+  background: var(--surface-active);
 }
 
 .settings-row {
@@ -467,141 +778,90 @@ button {
   text-align: center;
 }
 
-/* ============================== Layout: portrait (J7) */
-/* На вертикальном планшете всё стопкой: 2×2 виджеты, плеер, климат, апы.       */
-
-body.layout-portrait .widgets {
-  grid-template-columns: repeat(2, 1fr);
-}
-
-body.layout-portrait #middle {
-  grid-template-columns: 1fr;
-  grid-template-rows: auto auto;
-}
-
-body.layout-portrait .player {
-  grid-template-columns: 80px 1fr;
-}
-
-body.layout-portrait .player-art {
-  width: 80px;
-  height: 80px;
-}
-
-/* ============================== Layout: landscape (J8) */
-/* Широкий экран — оставляем default 4-колонные виджеты и 2-колонный middle.    */
-/* (default правила уже подходят, тут только тонкая полировка)                 */
-
-body.layout-landscape .widgets {
+.app-picker-list {
+  display: grid;
   grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+}
+
+.app-picker-item {
+  background: var(--surface-2);
+  border-radius: var(--radius-btn);
+  padding: 12px 8px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+}
+
+.app-picker-item:active {
+  background: var(--surface-active);
+}
+
+.app-picker-item .picker-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
+  background: var(--surface);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 22px;
+  font-weight: 600;
+  background-size: cover;
+}
+
+.app-picker-item .picker-label {
+  font-size: 11px;
+  text-align: center;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 100%;
 }
 
 /* ============================== Profile-specific tweaks */
 
 body.profile-j7 {
-  /* Можно задать тёплый акцент для J7 */
   --accent: #FFB55B;
 }
 
 body.profile-j8 {
-  /* J8 — более холодный синий */
   --accent: #6CC8FF;
 }
 
-body.profile-generic {
-  /* нейтральный default — уже задан в :root */
-}
-
-/* ============================== Profile: Chery Tiggo 9 (QHD 2560×1440) */
-/* Большой экран с высокой плотностью — увеличиваем шрифты и отступы.    */
-/* CSS-переменные --base-font-size / --widget-value-font / --gap / --radius */
-/* приходят из tiggo9.js через profile-loader.apply().                   */
-
 body.profile-tiggo9 {
-  /* Слегка тёплый акцент, отличающий Tiggo от Jaecoo */
   --accent: #FF9A4D;
-  /* Падает на :root через cssVars в профиле, но дублируем как fallback */
-  font-size: var(--base-font-size, 20px);
+  --btn-size: 144px;
+  --player-h: 304px;
+  --strip-h: 280px;
+  font-size: 16px;
 }
 
-body.profile-tiggo9 .widget-value {
-  font-size: var(--widget-value-font, 48px);
+body.profile-tiggo9 .ov-pill { font-size: 18px; padding: 12px 22px; }
+body.profile-tiggo9 #ov-time { font-size: 38px; }
+body.profile-tiggo9 .player-title { font-size: 19px; }
+body.profile-tiggo9 .t-current { font-size: 32px; }
+body.profile-tiggo9 .hvac-btn img { width: 48px; height: 48px; }
+
+/* ============================== Layout: portrait vs landscape */
+/* В нативе layout всегда совпадает с физической ориентацией экрана.            */
+/* На portrait — нижняя панель в "альбомной" компоновке не помещается, поэтому  */
+/* меняем grid-template на колонку: апы сверху, плеер ниже, климат внизу.       */
+
+body.layout-portrait #bottom-panel {
+  height: auto;
 }
 
-body.profile-tiggo9 .clock {
-  font-size: 52px;
+body.layout-portrait .top-row {
+  flex-direction: column;
 }
 
-body.profile-tiggo9 .date {
-  font-size: 18px;
+body.layout-portrait .player-block {
+  width: 100%;
 }
 
-body.profile-tiggo9 #topbar {
-  height: 100px;
-  padding: 24px 36px;
-}
-
-body.profile-tiggo9 #main {
-  padding: 0 36px 36px 36px;
-  height: calc(100vh - 100px);
-}
-
-body.profile-tiggo9 .icon-btn {
-  width: 56px;
-  height: 56px;
-  font-size: 22px;
-}
-
-body.profile-tiggo9 .player-art {
-  width: 128px;
-  height: 128px;
-}
-
-body.profile-tiggo9 .btn-media {
-  width: 60px;
-  height: 60px;
-  font-size: 28px;
-}
-
-body.profile-tiggo9 .hvac-btn {
-  height: 60px;
-  font-size: 18px;
-}
-
-body.profile-tiggo9 .step-btn {
-  width: 48px;
-  height: 48px;
-  font-size: 26px;
-}
-
-body.profile-tiggo9 .app-card {
-  min-width: 120px;
-  padding: 16px;
-}
-
-body.profile-tiggo9 .app-icon {
-  width: 64px;
-  height: 64px;
-}
-
-body.profile-tiggo9 .app-label {
-  font-size: 14px;
-  max-width: 110px;
-}
-
-/* ============================== Wallpaper background (опционально) */
-
-body.has-wallpaper {
-  background-image: url(../img/wallpaper.jpg);
-  background-size: cover;
-  background-position: center;
-}
-
-body.has-wallpaper::before {
-  content: '';
-  position: fixed;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.55);
-  pointer-events: none;
-  z-index: -1;
+body.layout-portrait .climate-strip {
+  grid-template-columns: 88px 1fr 88px;
 }
