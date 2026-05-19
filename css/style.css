@@ -861,9 +861,15 @@ body.profile-tiggo9 .hvac-btn.active { background: rgba(255, 154, 77, 0.10); }
 }
 
 .accent-swatch[data-accent="auto"] {
-  background: linear-gradient(135deg, #FFB55B 0%, #6CC8FF 50%, #A88BFF 100%);
+  background: conic-gradient(
+    from 180deg,
+    #FFB55B 0deg, #CD7F32 36deg, #FF5B5B 72deg, #FFD93D 108deg,
+    #56E39F 144deg, #4DD0E1 180deg, #6CC8FF 216deg, #5B8DFF 252deg,
+    #A88BFF 288deg, #FF6BD0 324deg, #FFB55B 360deg
+  );
   color: white;
-  text-shadow: 0 1px 2px rgba(0,0,0,0.5);
+  text-shadow: 0 1px 2px rgba(0,0,0,0.7);
+  font-weight: 800;
 }
 
 .about-text {
@@ -926,7 +932,7 @@ body.profile-j8 {
 }
 
 body.profile-tiggo9 {
-  --accent: #FF9A4D;
+  --accent: #CD7F32;     /* бронза — premium, отличается от J7 amber */
   --btn-size: 144px;
   --player-h: 296px;     /* = 2 × 144 + 8, синхронно с app-grid */
   --strip-h: 280px;
