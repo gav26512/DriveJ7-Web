@@ -49,6 +49,18 @@
     });
   });
 
+  // Volume ±5 шагами. JCarTools API: getvol/setvol (0..100).
+  const VOL_STEP = 5;
+  document.querySelectorAll('.btn-vol').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const cur = api.getVolume();
+      const next = btn.dataset.vol === 'up'
+        ? Math.min(100, cur + VOL_STEP)
+        : Math.max(0,   cur - VOL_STEP);
+      api.setVolume(next);
+    });
+  });
+
   render(null);
   api.on('musicInfo', render);
 })();

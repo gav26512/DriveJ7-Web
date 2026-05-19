@@ -15,7 +15,7 @@
   --radius-btn: 12px;
   --gap: 8px;
   --btn-size: 120px;
-  --player-h: 264px;     /* = 2 × btn-size + gap + 2×8 padding */
+  --player-h: 248px;     /* = 2 × btn-size + gap — равно высоте app-grid 3×2 (без ступеньки) */
   --strip-h: 248px;
 }
 
@@ -288,7 +288,24 @@ img {
   grid-area: ctrls;
   display: flex;
   align-items: center;
-  gap: 16px;
+  justify-content: center;
+  gap: 12px;
+}
+
+.btn-vol {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  font-size: 16px;
+  filter: grayscale(0.3);
+  transition: background .15s, transform .1s;
+}
+
+.btn-vol:active {
+  background: rgba(255, 255, 255, 0.12);
+  transform: scale(0.94);
 }
 
 .btn-media {
@@ -834,7 +851,7 @@ body.profile-j8 {
 body.profile-tiggo9 {
   --accent: #FF9A4D;
   --btn-size: 144px;
-  --player-h: 304px;
+  --player-h: 296px;     /* = 2 × 144 + 8, синхронно с app-grid */
   --strip-h: 280px;
   font-size: 16px;
 }
