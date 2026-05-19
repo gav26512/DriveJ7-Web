@@ -11,18 +11,15 @@
   <!-- ============================== Wallpaper layer (Bing daily) -->
   <div id="wallpaper" class="wallpaper"></div>
 
-  <!-- ============================== Floating overlay info (date/time, wifi, outdoor T) -->
-  <!-- В нативе это OverlayService floating widgets — в web версии рендерим в углу.   -->
-  <div id="overlay-info" class="overlay-info">
-    <div class="ov-datetime">
-      <div id="ov-time">--:--</div>
-      <div id="ov-date">—</div>
-    </div>
-    <div id="ov-outdoor" class="ov-pill">--°</div>
-    <!-- RPM-виджет скрыт по решению юзера. Если понадобится — раскомментировать -->
-    <!-- и включить через настройки (TODO: widget visibility toggles в Settings). -->
-    <!-- <div id="ov-rpm" class="ov-pill">---- <span class="ov-pill-unit">RPM</span></div> -->
+  <!-- Плавающие виджеты — каждый позиционируется независимо. Long-press 350ms       -->
+  <!-- начинает drag, позиция сохраняется в localStorage 'widget-pos.<id>'.          -->
+  <div id="ov-datetime" class="ov-widget ov-datetime" data-widget-id="datetime">
+    <div id="ov-time">--:--</div>
+    <div id="ov-date">—</div>
   </div>
+  <div id="ov-outdoor" class="ov-widget ov-pill" data-widget-id="outdoor">--°</div>
+  <!-- RPM-виджет скрыт. Раскомментировать когда понадобится. -->
+  <!-- <div id="ov-rpm" class="ov-widget ov-pill" data-widget-id="rpm">---- <span class="ov-pill-unit">RPM</span></div> -->
 
   <!-- ============================== Bottom panel -->
   <!-- Структура: Row[ AppGrid 2×3 + Player ] над ClimateStrip                    -->
@@ -179,6 +176,7 @@
   <script src="js/profile-loader.js"></script>
   <script src="js/wallpaper.js"></script>
   <script src="js/overlay-info.js"></script>
+  <script src="js/widget-drag.js"></script>
   <script src="js/apps.js"></script>
   <script src="js/player-detect.js"></script>
   <script src="js/music.js"></script>
