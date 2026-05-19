@@ -24,7 +24,8 @@ DriveJ7-Web/
 │   ├── profiles/
 │   │   ├── generic.js         — fallback-конфиг
 │   │   ├── j7.js              — Jaecoo J7 (portrait, бак 51/57л)
-│   │   └── j8.js              — Jaecoo J8 (landscape, бак ~70л)
+│   │   ├── j8.js              — Jaecoo J8 (landscape, бак ~70л)
+│   │   └── tiggo9.js          — Chery Tiggo 9 (landscape QHD 2560×1440, бак 70л)
 │   ├── clock.js               — часы
 │   ├── weather.js             — погода (event weather)
 │   ├── music.js               — медиа (event musicInfo + runEnum)
@@ -46,6 +47,7 @@ DriveJ7-Web/
 - `widgets.{rpm,speed,fuel,coolant,...}` — какие виджеты включить
 - `layout` — `portrait` / `landscape` / `auto`
 - `enumOverrides` — кастомные имена runEnum-команд (если у машины своя номенклатура)
+- `cssVars` — переопределения CSS-переменных (для high-DPI / больших экранов)
 
 **Выбор профиля** (`js/profile-loader.js`) по приоритету:
 1. URL hash `#profile=j7` — dev/тестинг

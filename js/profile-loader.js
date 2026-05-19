@@ -33,13 +33,19 @@
     const m = String(model).toLowerCase();
     if (m.includes('j7') || m.includes('jaecoo j7')) return 'j7';
     if (m.includes('j8') || m.includes('jaecoo j8')) return 'j8';
+    if (m.includes('tiggo 9') || m.includes('tiggo9')) return 'tiggo9';
     return null;
   }
 
   function fromOrientation() {
     // Эвристика: на portrait-устройствах предполагаем J7 (вертикальный планшет),
-    // на landscape — J8. Это грубо но даёт sensible default.
-    return window.innerHeight > window.innerWidth ? 'j7' : 'j8';
+    // на landscape с QHD-плотностью — Tiggo 9, иначе J8.
+    const w = window.innerWidth;
+    const h = window.innerHeight;
+    if (h > w) return 'j7';
+    // 2560×1440 → площадь >= 3.6M pixels, попадаем в Tiggo 9 диапазон.
+    if (w * h >= 3_500_000) return 'tiggo9';
+    return 'j8';
   }
 
   function chooseProfile() {
@@ -55,8 +61,12 @@
   }
 
   function apply(profile) {
-    document.body.classList.remove('profile-j7', 'profile-j8', 'profile-generic');
+    // Снимаем все profile-* классы и накладываем нужный.
+    Array.from(document.body.classList)
+      .filter((c) => c.startsWith('profile-'))
+      .forEach((c) => document.body.classList.remove(c));
     document.body.classList.add(profile.bodyClass);
+
     // layout='auto' → определяем по ориентации, иначе по явному значению.
     let layout = profile.layout;
     if (layout === 'auto') {
@@ -66,6 +76,13 @@
     document.body.classList.add(`layout-${layout}`);
     document.body.dataset.profile = profile.id;
     document.body.dataset.layout = layout;
+
+    // Применить cssVars из профиля (для high-DPI масштабирования и т.п.).
+    if (profile.cssVars) {
+      for (const [k, v] of Object.entries(profile.cssVars)) {
+        document.documentElement.style.setProperty(k, v);
+      }
+    }
   }
 
   const chosenId = chooseProfile();

@@ -512,6 +512,83 @@ body.profile-generic {
   /* нейтральный default — уже задан в :root */
 }
 
+/* ============================== Profile: Chery Tiggo 9 (QHD 2560×1440) */
+/* Большой экран с высокой плотностью — увеличиваем шрифты и отступы.    */
+/* CSS-переменные --base-font-size / --widget-value-font / --gap / --radius */
+/* приходят из tiggo9.js через profile-loader.apply().                   */
+
+body.profile-tiggo9 {
+  /* Слегка тёплый акцент, отличающий Tiggo от Jaecoo */
+  --accent: #FF9A4D;
+  /* Падает на :root через cssVars в профиле, но дублируем как fallback */
+  font-size: var(--base-font-size, 20px);
+}
+
+body.profile-tiggo9 .widget-value {
+  font-size: var(--widget-value-font, 48px);
+}
+
+body.profile-tiggo9 .clock {
+  font-size: 52px;
+}
+
+body.profile-tiggo9 .date {
+  font-size: 18px;
+}
+
+body.profile-tiggo9 #topbar {
+  height: 100px;
+  padding: 24px 36px;
+}
+
+body.profile-tiggo9 #main {
+  padding: 0 36px 36px 36px;
+  height: calc(100vh - 100px);
+}
+
+body.profile-tiggo9 .icon-btn {
+  width: 56px;
+  height: 56px;
+  font-size: 22px;
+}
+
+body.profile-tiggo9 .player-art {
+  width: 128px;
+  height: 128px;
+}
+
+body.profile-tiggo9 .btn-media {
+  width: 60px;
+  height: 60px;
+  font-size: 28px;
+}
+
+body.profile-tiggo9 .hvac-btn {
+  height: 60px;
+  font-size: 18px;
+}
+
+body.profile-tiggo9 .step-btn {
+  width: 48px;
+  height: 48px;
+  font-size: 26px;
+}
+
+body.profile-tiggo9 .app-card {
+  min-width: 120px;
+  padding: 16px;
+}
+
+body.profile-tiggo9 .app-icon {
+  width: 64px;
+  height: 64px;
+}
+
+body.profile-tiggo9 .app-label {
+  font-size: 14px;
+  max-width: 110px;
+}
+
 /* ============================== Wallpaper background (опционально) */
 
 body.has-wallpaper {
