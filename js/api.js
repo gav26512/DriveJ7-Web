@@ -89,7 +89,23 @@
      * optimistic state обратно в нули).
      */
     function applyStubEnum(name) {
-      // Level commands: name_L (1/2/3) или name_0/name_off (off).
+      // Fan: 0..10 (отдельно — иначе пересекается с seat 0..3 regex).
+      const fanMatch = name.match(/^fan_(\d+|off|up|down)$/);
+      if (fanMatch) {
+        const v = fanMatch[1];
+        if (v === 'off') {
+          stubCar.vehicle.fan = 0;
+        } else if (v === 'up') {
+          stubCar.vehicle.fan = Math.min(10, (stubCar.vehicle.fan || 0) + 1);
+        } else if (v === 'down') {
+          stubCar.vehicle.fan = Math.max(0, (stubCar.vehicle.fan || 0) - 1);
+        } else {
+          const n = Number(v);
+          if (n >= 0 && n <= 10) stubCar.vehicle.fan = n;
+        }
+        return;
+      }
+      // Level commands для сидений: name_L (1/2/3) или name_0/name_off (off).
       const lvlMatch = name.match(/^(.+?)_(0|1|2|3|off)$/);
       if (lvlMatch) {
         const base = lvlMatch[1];
@@ -101,7 +117,6 @@
           heat_zad_seat_r:  ['seats', 'rear', 'rightHeat'],
           vent_seat_l:      ['seats', 'front', 'driverVent'],
           vent_seat_r:      ['seats', 'front', 'passengerVent'],
-          fan:              ['vehicle', 'fan'],
         };
         const path = map[base];
         if (path) {

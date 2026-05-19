@@ -21,7 +21,10 @@
   // оставляем placeholder-имена с TODO, конкретные нужно уточнить у автора JCarTools.
 
   const BUTTONS = [
-    { id: 'auto',          type: 'toggle', stateKey: 'auto',          icon: 'auto',          cmd: { on: 'AUTO_On',           off: 'AUTO_Off' },           title: 'Авто' },
+    // AUTO — только включает. Выключение приходит через climateState event
+    // (когда юзер вручную крутит T/Fan, ECU выключает AUTO сам). См. native
+    // MainActivity.kt: `if (autoOn) return@ClimateToggle`.
+    { id: 'auto',          type: 'toggle', stateKey: 'auto',          icon: 'auto',          cmd: { on: 'AUTO_On',           off: 'AUTO_Off' },           title: 'Авто', onlyOn: true },
     { id: 'recirc',        type: 'toggle', stateKey: 'recirc',        icon: 'recirc',        cmd: { on: 'Recirculation_On',  off: 'Recirculation_Off' },  title: 'Рециркуляция' },
     { id: 'ac',            type: 'toggle', stateKey: 'ac',            text: 'AC',            cmd: { on: 'AC_On',             off: 'AC_Off' },             title: 'A/C' },
     { id: 'front_defrost', type: 'toggle', stateKey: 'front_defrost', icon: 'glass_front',   cmd: { on: 'heat_windshield_on', off: 'heat_windshield_off' }, title: 'Лоб. стекло' },
@@ -201,6 +204,9 @@
     let newValue;
     if (def.type === 'toggle') {
       const cur = readState(def.stateKey);
+      // `onlyOn`-кнопки (AUTO) при повторном клике остаются включёнными.
+      // Выключение приходит исключительно через climateState event от хоста.
+      if (def.onlyOn && cur) return;
       newValue = !cur;
       writeState(def.stateKey, newValue);
     } else if (def.type === 'level') {
