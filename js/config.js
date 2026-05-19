@@ -91,11 +91,14 @@
   window.configApi = { apply, set, DEFAULTS };
 
   // Применяем accent сразу при загрузке (до settings.js), иначе на 100-200ms
-  // мелькает default цвет.
+  // мелькает default цвет. Ставим на body (см. settings.js комментарий о каскаде).
   try {
     const accent = localStorage.getItem('accent-color');
     if (accent && accent !== 'auto') {
-      document.documentElement.style.setProperty('--accent', accent);
+      // body может ещё не быть готов на момент выполнения config.js
+      const apply = () => document.body.style.setProperty('--accent', accent);
+      if (document.body) apply();
+      else document.addEventListener('DOMContentLoaded', apply);
     }
   } catch (e) {}
 

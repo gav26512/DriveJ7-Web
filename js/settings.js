@@ -65,11 +65,14 @@
   // 'auto' → использовать default профиля (CSS правило body.profile-*).
   // конкретный HEX → переопределить --accent на :root.
   const ACCENT_KEY = 'accent-color';
+  // ВАЖНО: ставим на <body>, а не на <html>. body.profile-j7/j8/tiggo9
+  // переопределяет --accent в своих правилах — если поставим на <html>,
+  // правило body выиграет каскад. На самом body inline-style побеждает.
   function applyAccent(value) {
     if (value === 'auto' || !value) {
-      document.documentElement.style.removeProperty('--accent');
+      document.body.style.removeProperty('--accent');
     } else {
-      document.documentElement.style.setProperty('--accent', value);
+      document.body.style.setProperty('--accent', value);
     }
   }
   const savedAccent = localStorage.getItem(ACCENT_KEY) || 'auto';
