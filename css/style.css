@@ -1,0 +1,530 @@
+/* Drive J7 Web — стили. Dark по умолчанию, light переключается через body.theme-light. */
+
+:root {
+  --bg: #0F0D13;
+  --surface: #1A171F;
+  --surface-2: #251F2D;
+  --text: #ECECEC;
+  --text-dim: #9A93A8;
+  --accent: #6CC8FF;
+  --accent-warm: #FFB55B;
+  --border: rgba(255, 255, 255, 0.06);
+  --radius: 16px;
+  --gap: 12px;
+}
+
+body.theme-light {
+  --bg: #F2EFF6;
+  --surface: #FFFFFF;
+  --surface-2: #ECE7F3;
+  --text: #1A1A1F;
+  --text-dim: #5A5363;
+  --border: rgba(0, 0, 0, 0.06);
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html, body {
+  width: 100%;
+  height: 100%;
+  background: var(--bg);
+  color: var(--text);
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-size: 16px;
+  user-select: none;
+  -webkit-user-select: none;
+  overflow: hidden;
+}
+
+button {
+  background: none;
+  border: none;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+}
+
+/* ============================== Top bar */
+
+#topbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 24px;
+  height: 72px;
+}
+
+.topbar-left {
+  display: flex;
+  align-items: baseline;
+  gap: 14px;
+}
+
+.clock {
+  font-size: 36px;
+  font-weight: 700;
+  letter-spacing: -1px;
+}
+
+.date {
+  font-size: 14px;
+  color: var(--text-dim);
+}
+
+.topbar-right {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.weather {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 18px;
+  color: var(--text-dim);
+}
+
+.weather-icon {
+  font-size: 22px;
+}
+
+.icon-btn {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: var(--surface);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  transition: background .15s;
+}
+
+.icon-btn:active {
+  background: var(--surface-2);
+}
+
+/* ============================== Main grid */
+
+#main {
+  padding: 0 24px 24px 24px;
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  gap: var(--gap);
+  height: calc(100vh - 72px);
+}
+
+/* ============================== Widget row */
+
+.widgets {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--gap);
+}
+
+.widget {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  min-height: 88px;
+}
+
+.widget-value {
+  font-size: 32px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  color: var(--accent);
+}
+
+.widget[data-widget="outdoor"] .widget-value {
+  color: var(--accent-warm);
+}
+
+.widget-label {
+  margin-top: 4px;
+  font-size: 12px;
+  color: var(--text-dim);
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+}
+
+/* ============================== Player + climate */
+
+#middle {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--gap);
+  min-height: 0; /* чтоб grid сжимался */
+}
+
+.player {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 18px;
+  display: grid;
+  grid-template-columns: 96px 1fr;
+  grid-template-rows: auto 1fr auto;
+  gap: 14px;
+  align-items: center;
+}
+
+.player-art {
+  grid-row: 1 / span 2;
+  width: 96px;
+  height: 96px;
+  background: var(--surface-2);
+  border-radius: 12px;
+  background-size: cover;
+  background-position: center;
+}
+
+.player-info {
+  align-self: flex-end;
+  min-width: 0;
+}
+
+.player-title {
+  font-size: 16px;
+  font-weight: 600;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.player-artist {
+  margin-top: 2px;
+  font-size: 13px;
+  color: var(--text-dim);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.player-controls {
+  grid-column: 1 / -1;
+  display: flex;
+  justify-content: center;
+  gap: 24px;
+  font-size: 22px;
+}
+
+.btn-media {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: var(--surface-2);
+  transition: background .15s;
+}
+
+.btn-media:active {
+  background: var(--accent);
+  color: var(--bg);
+}
+
+.player-progress {
+  grid-column: 1 / -1;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 11px;
+  color: var(--text-dim);
+}
+
+.player-bar {
+  flex: 1;
+  height: 3px;
+  background: var(--surface-2);
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.player-bar-fill {
+  height: 100%;
+  background: var(--accent);
+  width: 0%;
+  transition: width .3s linear;
+}
+
+.player-time {
+  font-variant-numeric: tabular-nums;
+  min-width: 36px;
+}
+
+/* ============================== Climate */
+
+.climate {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.climate-row {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.hvac-btn {
+  flex: 1;
+  min-width: 64px;
+  height: 44px;
+  border-radius: 12px;
+  background: var(--surface-2);
+  color: var(--text-dim);
+  font-size: 14px;
+  transition: all .15s;
+}
+
+.hvac-btn.active {
+  background: var(--accent);
+  color: var(--bg);
+}
+
+.hvac-btn:active {
+  transform: scale(0.96);
+}
+
+.hvac-step {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--surface-2);
+  border-radius: 12px;
+  padding: 6px;
+  min-width: 0;
+}
+
+.step-btn {
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  background: var(--surface);
+  font-size: 20px;
+  font-weight: 600;
+}
+
+.step-btn:active {
+  background: var(--accent);
+  color: var(--bg);
+}
+
+.step-value {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 0;
+}
+
+.step-label {
+  font-size: 10px;
+  color: var(--text-dim);
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 100%;
+}
+
+.step-current {
+  font-size: 18px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ============================== Apps */
+
+.apps {
+  display: flex;
+  gap: 12px;
+  overflow-x: auto;
+  padding: 4px 0;
+}
+
+.app-card {
+  min-width: 88px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  transition: transform .12s;
+}
+
+.app-card:active {
+  transform: scale(0.96);
+}
+
+.app-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  background: var(--surface-2);
+  background-size: cover;
+}
+
+.app-label {
+  font-size: 12px;
+  text-align: center;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 80px;
+}
+
+/* ============================== Overlay (settings) */
+
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 50;
+}
+
+.overlay.hidden {
+  display: none;
+}
+
+.overlay-content {
+  width: min(500px, 90%);
+  background: var(--surface);
+  border-radius: var(--radius);
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.overlay-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.overlay-header h2 {
+  font-size: 20px;
+  font-weight: 600;
+}
+
+.settings-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+}
+
+.settings-row label {
+  font-size: 14px;
+  color: var(--text-dim);
+}
+
+.settings-row select,
+.settings-row input[type="range"] {
+  background: var(--surface-2);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 6px 12px;
+  font-size: 14px;
+}
+
+.settings-row.about {
+  font-size: 12px;
+  color: var(--text-dim);
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  padding-top: 12px;
+  border-top: 1px solid var(--border);
+}
+
+.about-text {
+  font-size: 11px;
+  color: var(--text-dim);
+  text-align: center;
+}
+
+/* ============================== Layout: portrait (J7) */
+/* На вертикальном планшете всё стопкой: 2×2 виджеты, плеер, климат, апы.       */
+
+body.layout-portrait .widgets {
+  grid-template-columns: repeat(2, 1fr);
+}
+
+body.layout-portrait #middle {
+  grid-template-columns: 1fr;
+  grid-template-rows: auto auto;
+}
+
+body.layout-portrait .player {
+  grid-template-columns: 80px 1fr;
+}
+
+body.layout-portrait .player-art {
+  width: 80px;
+  height: 80px;
+}
+
+/* ============================== Layout: landscape (J8) */
+/* Широкий экран — оставляем default 4-колонные виджеты и 2-колонный middle.    */
+/* (default правила уже подходят, тут только тонкая полировка)                 */
+
+body.layout-landscape .widgets {
+  grid-template-columns: repeat(4, 1fr);
+}
+
+/* ============================== Profile-specific tweaks */
+
+body.profile-j7 {
+  /* Можно задать тёплый акцент для J7 */
+  --accent: #FFB55B;
+}
+
+body.profile-j8 {
+  /* J8 — более холодный синий */
+  --accent: #6CC8FF;
+}
+
+body.profile-generic {
+  /* нейтральный default — уже задан в :root */
+}
+
+/* ============================== Wallpaper background (опционально) */
+
+body.has-wallpaper {
+  background-image: url(../img/wallpaper.jpg);
+  background-size: cover;
+  background-position: center;
+}
+
+body.has-wallpaper::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.55);
+  pointer-events: none;
+  z-index: -1;
+}

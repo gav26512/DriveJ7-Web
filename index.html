@@ -1,0 +1,162 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+  <title>Drive J7</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body class="theme-dark">
+
+  <!-- ============================== Top bar (часы + погода + кнопки) -->
+  <header id="topbar">
+    <div class="topbar-left">
+      <div id="clock" class="clock"></div>
+      <div id="date" class="date"></div>
+    </div>
+    <div class="topbar-right">
+      <div id="weather" class="weather" aria-label="weather">
+        <span class="weather-icon">☀</span>
+        <span class="weather-temp">--°</span>
+      </div>
+      <button id="btn-settings" class="icon-btn" aria-label="settings">⚙</button>
+      <button id="btn-close" class="icon-btn" aria-label="close">✕</button>
+    </div>
+  </header>
+
+  <!-- ============================== Main grid -->
+  <main id="main">
+    <!-- Widget row: RPM | Speed | Outdoor T | Battery -->
+    <section id="widgets" class="widgets">
+      <div class="widget" data-widget="rpm">
+        <div class="widget-value" id="w-rpm">----</div>
+        <div class="widget-label" data-i18n="widget.rpm">об/мин</div>
+      </div>
+      <div class="widget" data-widget="speed">
+        <div class="widget-value" id="w-speed">0</div>
+        <div class="widget-label" data-i18n="widget.speed_kmh">км/ч</div>
+      </div>
+      <div class="widget" data-widget="outdoor">
+        <div class="widget-value" id="w-outdoor">--°</div>
+        <div class="widget-label" data-i18n="widget.outdoor">За бортом</div>
+      </div>
+      <div class="widget" data-widget="battery">
+        <div class="widget-value" id="w-battery">--.- V</div>
+        <div class="widget-label" data-i18n="widget.battery">Бортовая</div>
+      </div>
+    </section>
+
+    <!-- Music player + Climate strip -->
+    <section id="middle">
+      <div class="player" id="player">
+        <div class="player-art" id="player-art"></div>
+        <div class="player-info">
+          <div class="player-title" id="player-title" data-i18n="music.no_track">Нет трека</div>
+          <div class="player-artist" id="player-artist" data-i18n="music.unknown_artist">—</div>
+        </div>
+        <div class="player-controls">
+          <button class="btn-media" data-cmd="MEDIA_PREV" aria-label="prev">⏮</button>
+          <button class="btn-media" data-cmd="MEDIA_PLAY_PAUSE" aria-label="play/pause">⏯</button>
+          <button class="btn-media" data-cmd="MEDIA_NEXT" aria-label="next">⏭</button>
+        </div>
+        <div class="player-progress">
+          <span class="player-time" id="player-pos">0:00</span>
+          <div class="player-bar"><div class="player-bar-fill" id="player-bar"></div></div>
+          <span class="player-time" id="player-dur">0:00</span>
+        </div>
+      </div>
+
+      <div class="climate" id="climate">
+        <div class="climate-row">
+          <button class="hvac-btn" data-hvac="auto" data-i18n="hvac.auto">Авто</button>
+          <button class="hvac-btn" data-hvac="ac" data-i18n="hvac.ac">AC</button>
+          <button class="hvac-btn" data-hvac="recirc" data-i18n="hvac.recirc">Цирк</button>
+          <button class="hvac-btn" data-hvac="front_defrost" data-i18n="hvac.front_defrost">Лоб.</button>
+          <button class="hvac-btn" data-hvac="rear_defrost" data-i18n="hvac.rear_defrost">Зад.</button>
+          <button class="hvac-btn" data-hvac="steering_heat" data-i18n="hvac.steering_heat">Руль</button>
+        </div>
+        <div class="climate-row">
+          <div class="hvac-step">
+            <button class="step-btn" data-hvac-step="driver_down">−</button>
+            <div class="step-value">
+              <span class="step-label" data-i18n="hvac.temp_driver">T водителя</span>
+              <span class="step-current" id="t-driver">22°</span>
+            </div>
+            <button class="step-btn" data-hvac-step="driver_up">+</button>
+          </div>
+          <div class="hvac-step">
+            <button class="step-btn" data-hvac-step="fan_down">−</button>
+            <div class="step-value">
+              <span class="step-label" data-i18n="hvac.fan">Обдув</span>
+              <span class="step-current" id="t-fan">--</span>
+            </div>
+            <button class="step-btn" data-hvac-step="fan_up">+</button>
+          </div>
+          <div class="hvac-step">
+            <button class="step-btn" data-hvac-step="passenger_down">−</button>
+            <div class="step-value">
+              <span class="step-label" data-i18n="hvac.temp_passenger">T пассажира</span>
+              <span class="step-current" id="t-passenger">22°</span>
+            </div>
+            <button class="step-btn" data-hvac-step="passenger_up">+</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- App launcher -->
+    <section id="apps" class="apps">
+      <!-- иконки приложений вставляются в js/apps.js -->
+    </section>
+  </main>
+
+  <!-- ============================== Settings overlay -->
+  <div id="settings-overlay" class="overlay hidden">
+    <div class="overlay-content">
+      <header class="overlay-header">
+        <h2 data-i18n="settings.title">Настройки</h2>
+        <button id="settings-close" class="icon-btn" aria-label="close">✕</button>
+      </header>
+      <div class="settings-row">
+        <label data-i18n="settings.theme">Тема</label>
+        <select id="setting-theme">
+          <option value="dark" data-i18n="settings.theme_dark">Тёмная</option>
+          <option value="light" data-i18n="settings.theme_light">Светлая</option>
+        </select>
+      </div>
+      <div class="settings-row">
+        <label data-i18n="settings.language">Язык</label>
+        <select id="setting-lang">
+          <option value="ru">Русский</option>
+          <option value="en">English</option>
+        </select>
+      </div>
+      <div class="settings-row">
+        <label data-i18n="settings.brightness">Яркость</label>
+        <input type="range" id="setting-brightness" min="0" max="100" value="80">
+      </div>
+      <div class="settings-row about" data-i18n="settings.about">О приложении</div>
+      <div class="about-text">Drive J7 web · v0.1.0 · gav26512/DriveJ7-Web</div>
+    </div>
+  </div>
+
+  <!-- ============================== Scripts -->
+  <script src="js/api.js"></script>
+  <script src="js/i18n.js"></script>
+  <!-- Профили: сначала декларации, потом loader применяет один -->
+  <script src="js/profiles/generic.js"></script>
+  <script src="js/profiles/j7.js"></script>
+  <script src="js/profiles/j8.js"></script>
+  <script src="js/profile-loader.js"></script>
+  <!-- UI-модули -->
+  <script src="js/clock.js"></script>
+  <script src="js/weather.js"></script>
+  <script src="js/music.js"></script>
+  <script src="js/apps.js"></script>
+  <script src="js/climate.js"></script>
+  <script src="js/widgets.js"></script>
+  <script src="js/settings.js"></script>
+  <!-- Core bootstrap — последний -->
+  <script src="js/core.js"></script>
+</body>
+</html>
