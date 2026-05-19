@@ -17,6 +17,7 @@
   --btn-size: 120px;
   --player-h: 248px;     /* = 2 × btn-size + gap — равно высоте app-grid 3×2 (без ступеньки) */
   --strip-h: 248px;
+  --art-size: 232px;     /* почти во всю высоту проигрывателя (player-h − padding 2×8) */
 }
 
 body.theme-light {
@@ -230,34 +231,35 @@ img {
   -webkit-backdrop-filter: blur(10px);
   border: 1px solid var(--border);
   border-radius: var(--radius-card);
-  padding: 14px 18px;
+  padding: 8px 12px;
   display: grid;
-  grid-template-columns: 112px 1fr auto;
+  grid-template-columns: var(--art-size) 1fr auto;
   grid-template-rows: auto auto 1fr auto;
   grid-template-areas:
     "art info  extras"
     "art ctrls extras"
     "art prog  extras"
     "art prog  extras";
-  gap: 10px 14px;
+  gap: 10px 16px;
   align-items: center;
 }
 
 .player-art {
   grid-area: art;
-  width: 112px;
-  height: 112px;
+  width: var(--art-size);
+  height: var(--art-size);
   background: var(--surface-2);
-  border-radius: 14px;
+  border-radius: 12px;
   background-size: cover;
   background-position: center;
   display: flex;
   align-items: center;
   justify-content: center;
+  flex-shrink: 0;
 }
 
 .player-art-placeholder {
-  font-size: 40px;
+  font-size: 72px;
   color: var(--text-dim);
 }
 
@@ -853,6 +855,7 @@ body.profile-tiggo9 {
   --btn-size: 144px;
   --player-h: 296px;     /* = 2 × 144 + 8, синхронно с app-grid */
   --strip-h: 280px;
+  --art-size: 280px;     /* почти во всю высоту */
   font-size: 16px;
 }
 
@@ -860,7 +863,7 @@ body.profile-tiggo9 .ov-pill { font-size: 18px; padding: 12px 22px; }
 body.profile-tiggo9 #ov-time { font-size: 38px; }
 body.profile-tiggo9 .player-title { font-size: 19px; }
 body.profile-tiggo9 .t-current { font-size: 32px; }
-body.profile-tiggo9 .hvac-btn img { width: 48px; height: 48px; }
+body.profile-tiggo9 .hvac-icon { width: 48px; height: 48px; }
 
 /* ============================== Layout: portrait vs landscape */
 /* В нативе layout всегда совпадает с физической ориентацией экрана.            */
