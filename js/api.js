@@ -5,8 +5,10 @@
 // чтобы UI можно было отлаживать на ноутбуке.
 //
 // API-документация: https://github.com/JCarTools/core_manifest
-// Реальный токен авторизации передаётся JCarTools'ом (или живёт в его конфиге).
-// Для dev-stub'а — захардкожен `SECURE_TOKEN_2025` как в их default_web_black.
+//
+// Токен авторизации `SECURE_TOKEN_2025` — единый для всех web-расширений JCarTools
+// (подтверждено в JCarTools/StreletS27/js/core.js). Конвенция: хост может
+// переопределить через `window.ANDROID_TOKEN`, иначе используется fallback.
 
 (() => {
   const TOKEN_FALLBACK = 'SECURE_TOKEN_2025';
@@ -14,8 +16,8 @@
   /** true если мы внутри JCarTools, false если в обычном Chrome. */
   const isHost = typeof window.androidApi === 'object' && window.androidApi !== null;
 
-  /** Токен берём из window-переменной (если автор положил), иначе из fallback. */
-  const TOKEN = (typeof window.JCT_TOKEN === 'string' && window.JCT_TOKEN) || TOKEN_FALLBACK;
+  /** Токен: window.ANDROID_TOKEN (если хост положил) → fallback. */
+  const TOKEN = (typeof window.ANDROID_TOKEN === 'string' && window.ANDROID_TOKEN) || TOKEN_FALLBACK;
 
   // ============================== Browser stub ==============================
   // Все методы возвращают такие же типы что и реальный androidApi: JSON-строки

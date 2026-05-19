@@ -13,32 +13,40 @@
   // icon: data-icon атрибут для CSS-маски; text: текст вместо иконки (для AC)
   // badge: бейдж в углу (например "З" для задних сидений)
 
+  // Имена runEnum-команд взяты из реализации StreletS27 (репо JCarTools/StreletS27/js/climate.js):
+  //   - Toggle: cmd.on/cmd.off (binary)
+  //   - Level (0..3): cmd.base + '_' + level (1/2/3), cmd.off (=0)
+  //
+  // AUTO/AC/Fan/T_driver/T_passenger в StreletS27 не задокументированы —
+  // оставляем placeholder-имена с TODO, конкретные нужно уточнить у автора JCarTools.
+
   const BUTTONS = [
-    { id: 'auto',          type: 'toggle', stateKey: 'auto',          icon: 'auto',          cmd: 'HVAC_AUTO_TOGGLE',          title: 'Авто' },
-    { id: 'recirc',        type: 'toggle', stateKey: 'recirc',        icon: 'recirc',        cmd: 'HVAC_RECIRC_TOGGLE',        title: 'Рециркуляция' },
-    { id: 'ac',            type: 'toggle', stateKey: 'ac',            text: 'AC',            cmd: 'HVAC_AC_TOGGLE',            title: 'A/C' },
-    { id: 'front_defrost', type: 'toggle', stateKey: 'front_defrost', icon: 'glass_front',   cmd: 'HVAC_FRONT_DEFROST_TOGGLE', title: 'Лоб. стекло' },
-    { id: 'rear_defrost',  type: 'toggle', stateKey: 'rear_defrost',  icon: 'glass_rear',    cmd: 'HVAC_REAR_DEFROST_TOGGLE',  title: 'Зад. стекло' },
-    { id: 'steering_heat', type: 'toggle', stateKey: 'steering_heat', icon: 'steer',         cmd: 'HVAC_STEERING_HEAT_TOGGLE', title: 'Подогрев руля' },
-    { id: 'seat_drv',      type: 'level',  stateKey: 'seats.drv',     icon: 'seat_heat_drv', cmd: 'HVAC_SEAT_DRIVER_HEAT_CYCLE',  title: 'Подогрев водителя' },
-    { id: 'seat_pass',     type: 'level',  stateKey: 'seats.pass',    icon: 'seat_heat_pass',cmd: 'HVAC_SEAT_PASSENGER_HEAT_CYCLE', title: 'Подогрев пассажира' },
-    { id: 'seat_rl',       type: 'level',  stateKey: 'seats.rl',      icon: 'seat_heat_drv', cmd: 'HVAC_SEAT_REAR_LEFT_HEAT_CYCLE',  title: 'Подогрев заднего левого', badge: 'З' },
-    { id: 'seat_rr',       type: 'level',  stateKey: 'seats.rr',      icon: 'seat_heat_pass',cmd: 'HVAC_SEAT_REAR_RIGHT_HEAT_CYCLE', title: 'Подогрев заднего правого', badge: 'З' },
-    { id: 'vent_drv',      type: 'level',  stateKey: 'vents.drv',     icon: 'seat_vent_drv', cmd: 'HVAC_SEAT_DRIVER_VENT_CYCLE',  title: 'Обдув водителя' },
-    { id: 'vent_pass',     type: 'level',  stateKey: 'vents.pass',    icon: 'seat_vent_pass',cmd: 'HVAC_SEAT_PASSENGER_VENT_CYCLE', title: 'Обдув пассажира' },
+    { id: 'auto',          type: 'toggle', stateKey: 'auto',          icon: 'auto',          cmd: { on: 'AUTO_On',           off: 'AUTO_Off' },           title: 'Авто' },
+    { id: 'recirc',        type: 'toggle', stateKey: 'recirc',        icon: 'recirc',        cmd: { on: 'Recirculation_On',  off: 'Recirculation_Off' },  title: 'Рециркуляция' },
+    { id: 'ac',            type: 'toggle', stateKey: 'ac',            text: 'AC',            cmd: { on: 'AC_On',             off: 'AC_Off' },             title: 'A/C' },
+    { id: 'front_defrost', type: 'toggle', stateKey: 'front_defrost', icon: 'glass_front',   cmd: { on: 'heat_windshield_on', off: 'heat_windshield_off' }, title: 'Лоб. стекло' },
+    { id: 'rear_defrost',  type: 'toggle', stateKey: 'rear_defrost',  icon: 'glass_rear',    cmd: { on: 'heat_rearwindow_on', off: 'heat_rearwindow_off' }, title: 'Зад. стекло' },
+    { id: 'steering_heat', type: 'toggle', stateKey: 'steering_heat', icon: 'steer',         cmd: { on: 'heat_wheel_on',     off: 'heat_wheel_off' },     title: 'Подогрев руля' },
+    { id: 'seat_drv',      type: 'level',  stateKey: 'seats.drv',     icon: 'seat_heat_drv', cmd: { base: 'heat_seat_l',     off: 'heat_seat_l_0' },     title: 'Подогрев водителя' },
+    { id: 'seat_pass',     type: 'level',  stateKey: 'seats.pass',    icon: 'seat_heat_pass',cmd: { base: 'heat_seat_r',     off: 'heat_seat_r_0' },     title: 'Подогрев пассажира' },
+    { id: 'seat_rl',       type: 'level',  stateKey: 'seats.rl',      icon: 'seat_heat_drv', cmd: { base: 'heat_zad_seat_l', off: 'heat_zad_seat_l_0' }, title: 'Подогрев заднего левого', badge: 'З' },
+    { id: 'seat_rr',       type: 'level',  stateKey: 'seats.rr',      icon: 'seat_heat_pass',cmd: { base: 'heat_zad_seat_r', off: 'heat_zad_seat_r_off' }, title: 'Подогрев заднего правого', badge: 'З' },
+    { id: 'vent_drv',      type: 'level',  stateKey: 'vents.drv',     icon: 'seat_vent_drv', cmd: { base: 'vent_seat_l',     off: 'vent_seat_l_0' },     title: 'Обдув водителя' },
+    { id: 'vent_pass',     type: 'level',  stateKey: 'vents.pass',    icon: 'seat_vent_pass',cmd: { base: 'vent_seat_r',     off: 'vent_seat_r_0' },     title: 'Обдув пассажира' },
   ];
 
   // Step-команды (T water/passenger/fan up/down) — не в DnD grid, в T-stepper'ах и Fan-bar.
+  // TODO: точные имена для T+/-/Fan+/- уточнить у автора JCarTools — в StreletS27 не нашли.
   const STEP_CMDS = {
-    driver_up:     'HVAC_TEMP_DRIVER_UP',
-    driver_down:   'HVAC_TEMP_DRIVER_DOWN',
-    passenger_up:  'HVAC_TEMP_PASSENGER_UP',
-    passenger_down:'HVAC_TEMP_PASSENGER_DOWN',
-    fan_up:        'HVAC_FAN_UP',
-    fan_down:      'HVAC_FAN_DOWN',
-    mem_1:         'SEAT_MEMORY_RECALL_1',
-    mem_2:         'SEAT_MEMORY_RECALL_2',
-    mem_3:         'SEAT_MEMORY_RECALL_3',
+    driver_up:     'temp_driver_up',
+    driver_down:   'temp_driver_down',
+    passenger_up:  'temp_passenger_up',
+    passenger_down:'temp_passenger_down',
+    fan_up:        'fan_up',
+    fan_down:      'fan_down',
+    mem_1:         'voditel_seat_1',   // подтверждено в StreletS27
+    mem_2:         'voditel_seat_2',
+    mem_3:         'voditel_seat_3',
   };
 
   // ============================== State (optimistic UI)
@@ -85,6 +93,24 @@
       return;
     }
     api.runEnum(cmdName);
+  }
+
+  /**
+   * Вычисляет имя runEnum-команды по button-def и новому состоянию.
+   * - Toggle (cmd={on, off}): `cmd.on` если newState=true, иначе `cmd.off`.
+   * - Level (cmd={base, off}): `cmd.off` если newLevel=0, иначе `cmd.base_<level>`.
+   * @returns {string|null}
+   */
+  function resolveCmd(def, newValue) {
+    const c = def.cmd;
+    if (!c) return null;
+    if (def.type === 'toggle') {
+      return newValue ? c.on : c.off;
+    }
+    if (def.type === 'level') {
+      return newValue === 0 ? c.off : `${c.base}_${newValue}`;
+    }
+    return null;
   }
 
   // ============================== Order storage
@@ -155,9 +181,14 @@
       for (let i = 0; i < 3; i++) dots.appendChild(document.createElement('span'));
       btn.appendChild(dots);
     }
-    // Дизейбл если команда не доступна.
-    if (availableCmds.size > 0 && def.cmd && !availableCmds.has(def.cmd)) {
-      btn.classList.add('disabled');
+    // Дизейбл если ни одна из cmd-вариаций кнопки не в availableCmds.
+    if (availableCmds.size > 0 && def.cmd) {
+      const allCmds = def.type === 'toggle'
+        ? [def.cmd.on, def.cmd.off]
+        : [def.cmd.off, `${def.cmd.base}_1`, `${def.cmd.base}_2`, `${def.cmd.base}_3`];
+      if (!allCmds.some((c) => availableCmds.has(c))) {
+        btn.classList.add('disabled');
+      }
     }
     btn.addEventListener('click', () => onClick(def, btn));
     return btn;
@@ -165,17 +196,18 @@
 
   function onClick(def, btn) {
     if (btn.classList.contains('disabled')) return;
+    let newValue;
     if (def.type === 'toggle') {
       const cur = readState(def.stateKey);
-      writeState(def.stateKey, !cur);
-      updateButtonVisual(btn, def);
+      newValue = !cur;
+      writeState(def.stateKey, newValue);
     } else if (def.type === 'level') {
       const cur = readState(def.stateKey);
-      const next = (cur + 1) % 4;
-      writeState(def.stateKey, next);
-      updateButtonVisual(btn, def);
+      newValue = (cur + 1) % 4;
+      writeState(def.stateKey, newValue);
     }
-    runIfAvailable(def.cmd);
+    updateButtonVisual(btn, def);
+    runIfAvailable(resolveCmd(def, newValue));
   }
 
   function updateButtonVisual(btn, def) {

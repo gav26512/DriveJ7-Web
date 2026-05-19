@@ -854,13 +854,8 @@ body.layout-portrait #bottom-panel {
   height: auto;
 }
 
-body.layout-portrait .top-row {
-  flex-direction: column;
-}
-
-body.layout-portrait .player-block {
-  width: 100%;
-}
+/* На portrait apps + player всё равно в одном горизонтальном ряду — */
+/* user spec: "проигрыватель и набор кнопок 3х2 в одном ряду".          */
 
 body.layout-portrait .climate-strip {
   grid-template-columns: 88px 1fr 88px;
