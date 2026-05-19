@@ -16,11 +16,24 @@
 
   // ============================== Widget visibility + climate config checkboxes
   const cfgCheckboxes = [
-    { id: 'cfg-w-dt',    key: 'widgetDateTime' },
-    { id: 'cfg-w-temp',  key: 'widgetOutdoorT' },
-    { id: 'cfg-two-zone', key: 'twoZoneClimate' },
-    { id: 'cfg-mem2',    key: 'memorySlot2' },
-    { id: 'cfg-mem3',    key: 'memorySlot3' },
+    // Плавающие виджеты
+    { id: 'cfg-w-wifi',    key: 'widgetWifi' },
+    { id: 'cfg-w-dt',      key: 'widgetDateTime' },
+    { id: 'cfg-w-temp',    key: 'widgetOutdoorT' },
+    // Кнопки климата
+    { id: 'cfg-two-zone',  key: 'twoZoneClimate' },
+    { id: 'cfg-auto',      key: 'auto' },
+    { id: 'cfg-recirc',    key: 'recirc' },
+    { id: 'cfg-front-glass', key: 'frontGlass' },
+    { id: 'cfg-rear-glass',  key: 'rearGlass' },
+    { id: 'cfg-steer-heat',  key: 'steerHeat' },
+    { id: 'cfg-rear-seat',   key: 'rearSeat' },
+    { id: 'cfg-vent-drv',    key: 'seatVentDrv' },
+    { id: 'cfg-vent-pass',   key: 'seatVentPass' },
+    // Память
+    { id: 'cfg-mem1',  key: 'memorySlot1' },
+    { id: 'cfg-mem2',  key: 'memorySlot2' },
+    { id: 'cfg-mem3',  key: 'memorySlot3' },
   ];
   for (const cb of cfgCheckboxes) {
     const el = document.getElementById(cb.id);

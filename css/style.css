@@ -718,13 +718,26 @@ body.profile-tiggo9 .hvac-btn.active { background: rgba(255, 154, 77, 0.10); }
   max-width: 100vw;
   max-height: 100vh;
   overflow-y: auto;
+  overscroll-behavior: contain;     /* блокирует пробрасывание скролла на body */
+  -webkit-overflow-scrolling: touch; /* плавная inertia на touch-экранах */
   background: var(--bg);
   border: none;
   border-radius: 0;
   padding: 32px 48px;
+  padding-bottom: 64px;             /* запас под последний элемент */
   display: flex;
   flex-direction: column;
   gap: 16px;
+}
+
+/* Sticky-хедер чтобы крестик закрытия всегда был сверху при скролле. */
+.overlay-content .overlay-header {
+  position: sticky;
+  top: -32px;                       /* компенсация padding-top */
+  padding: 24px 0 16px 0;
+  margin: -32px 0 0 0;
+  background: var(--bg);
+  z-index: 5;
 }
 
 /* Settings overlay — фон не размытый, чтобы видна была раскладка под ним. */

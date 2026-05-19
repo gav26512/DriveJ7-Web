@@ -13,11 +13,24 @@
   const STORAGE_KEY = 'config-v1';
 
   const DEFAULTS = {
+    // Плавающие виджеты
+    widgetWifi:     false,   // нет API в core_manifest пока
     widgetDateTime: true,
     widgetOutdoorT: true,
+    // Кнопки климата
     twoZoneClimate: true,
-    memorySlot2: true,
-    memorySlot3: true,
+    auto:           true,
+    recirc:         true,
+    frontGlass:     true,
+    rearGlass:      true,
+    steerHeat:      true,
+    rearSeat:       true,    // задние сиденья (подогрев)
+    seatVentDrv:    true,
+    seatVentPass:   true,
+    // Память сидений
+    memorySlot1:    true,
+    memorySlot2:    true,
+    memorySlot3:    true,
   };
 
   function load() {
@@ -37,16 +50,32 @@
   /** Применить config к DOM — спрятать/показать виджеты и кнопки. */
   function apply() {
     const c = window.config;
-    setVisible('ov-datetime', c.widgetDateTime);
-    setVisible('ov-outdoor', c.widgetOutdoorT);
-    setVisible('t-pass-stepper', c.twoZoneClimate);
-    // В1/В2/В3 — В1 всегда видна (по умолчанию активная), В2/В3 опционально
-    setVisible(null, c.memorySlot2, '[data-mem="2"]');
-    setVisible(null, c.memorySlot3, '[data-mem="3"]');
+    // Плавающие виджеты
+    bySel('#ov-datetime',                       c.widgetDateTime);
+    bySel('#ov-outdoor',                        c.widgetOutdoorT);
+    // (WiFi widget пока не реализован)
+
+    // Климат
+    bySel('#t-pass-stepper',                    c.twoZoneClimate);
+    bySel('[data-btn-id="auto"]',               c.auto);
+    bySel('[data-btn-id="recirc"]',             c.recirc);
+    bySel('[data-btn-id="front_defrost"]',      c.frontGlass);
+    bySel('[data-btn-id="rear_defrost"]',       c.rearGlass);
+    bySel('[data-btn-id="steering_heat"]',      c.steerHeat);
+    // Задние сиденья — пара (RL + RR)
+    bySel('[data-btn-id="seat_rl"]',            c.rearSeat);
+    bySel('[data-btn-id="seat_rr"]',            c.rearSeat);
+    bySel('[data-btn-id="vent_drv"]',           c.seatVentDrv);
+    bySel('[data-btn-id="vent_pass"]',          c.seatVentPass);
+
+    // Память сидений
+    bySel('[data-mem="1"]',                     c.memorySlot1);
+    bySel('[data-mem="2"]',                     c.memorySlot2);
+    bySel('[data-mem="3"]',                     c.memorySlot3);
   }
 
-  function setVisible(id, visible, sel) {
-    const el = id ? document.getElementById(id) : (sel ? document.querySelector(sel) : null);
+  function bySel(sel, visible) {
+    const el = document.querySelector(sel);
     if (el) el.style.display = visible ? '' : 'none';
   }
 
