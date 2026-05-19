@@ -41,6 +41,7 @@
       startY = ev.clientY;
       lastX = startX;
       lastY = startY;
+      console.log('[dnd] pointerdown on', target.dataset.dndId, 'waiting', LONGPRESS_MS, 'ms');
       pressTimer = setTimeout(() => startDrag(), LONGPRESS_MS);
     }
 
@@ -53,6 +54,7 @@
           const dx = Math.abs(ev.clientX - startX);
           const dy = Math.abs(ev.clientY - startY);
           if (dx > MOVE_THRESHOLD_PX || dy > MOVE_THRESHOLD_PX) {
+            console.log('[dnd] cancelled by move dx=', dx, 'dy=', dy);
             clearTimeout(pressTimer);
             pressedEl = null;
           }
@@ -114,12 +116,12 @@
       });
       document.body.appendChild(dragGhost);
       navigator.vibrate?.(20);
-      console.debug('[dnd] startDrag', dragging.dataset.dndId);
+      console.log('[dnd] ▶ START DRAG', dragging.dataset.dndId);
     }
 
     function endDrag() {
       if (!dragging) return;
-      console.debug('[dnd] endDrag');
+      console.log('[dnd] ◀ END DRAG');
       dragging.classList.remove('dnd-dragging');
       dragging = null;
       if (dragGhost) {

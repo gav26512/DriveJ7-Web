@@ -318,10 +318,16 @@
   setInterval(syncFromCarData, 2000);
 
   // Подключаем DnD к hvac-grid.
-  window.dnd?.enable(gridEl, {
-    onReorder: (ids) => {
-      saveOrder(ids);
-      console.info('[climate] reordered:', ids.join(','));
-    },
-  });
+  console.log('[climate] init: gridEl =', gridEl, ', children =', gridEl?.children.length, ', window.dnd =', typeof window.dnd);
+  if (window.dnd && gridEl) {
+    window.dnd.enable(gridEl, {
+      onReorder: (ids) => {
+        saveOrder(ids);
+        console.info('[climate] reordered:', ids.join(','));
+      },
+    });
+    console.log('[climate] DnD enabled on', gridEl.children.length, 'buttons');
+  } else {
+    console.error('[climate] DnD NOT enabled: dnd=', !!window.dnd, ' gridEl=', !!gridEl);
+  }
 })();
