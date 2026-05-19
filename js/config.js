@@ -53,7 +53,7 @@
     // Плавающие виджеты
     bySel('#ov-datetime',                       c.widgetDateTime);
     bySel('#ov-outdoor',                        c.widgetOutdoorT);
-    // (WiFi widget пока не реализован)
+    bySel('#ov-wifi',                           c.widgetWifi);
 
     // Климат
     bySel('#t-pass-stepper',                    c.twoZoneClimate);

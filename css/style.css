@@ -90,6 +90,16 @@ img {
 
 #ov-datetime { top: 16px; left: 16px; }
 #ov-outdoor  { top: 16px; right: 16px; }
+#ov-wifi     { top: 76px; right: 16px; }    /* под T за бортом */
+
+#ov-wifi {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.wifi-icon { font-size: 16px; }
+.wifi-label { font-size: 13px; color: var(--text-dim); }
 
 .ov-datetime {
   background: rgba(255, 255, 255, 0.92);
@@ -713,36 +723,32 @@ body.profile-tiggo9 .hvac-btn.active { background: rgba(255, 154, 77, 0.10); }
 }
 
 .overlay-content {
-  width: 100%;
-  height: 100%;
-  max-width: 100vw;
-  max-height: 100vh;
+  width: min(560px, 90%);
+  max-height: 85vh;
   overflow-y: auto;
-  overscroll-behavior: contain;     /* блокирует пробрасывание скролла на body */
-  -webkit-overflow-scrolling: touch; /* плавная inertia на touch-экранах */
-  background: var(--bg);
-  border: none;
-  border-radius: 0;
-  padding: 32px 48px;
-  padding-bottom: 64px;             /* запас под последний элемент */
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+  background: var(--surface);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-card);
+  padding: 24px;
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 14px;
 }
 
 /* Sticky-хедер чтобы крестик закрытия всегда был сверху при скролле. */
 .overlay-content .overlay-header {
   position: sticky;
-  top: -32px;                       /* компенсация padding-top */
-  padding: 24px 0 16px 0;
-  margin: -32px 0 0 0;
-  background: var(--bg);
+  top: -24px;                        /* компенсация padding-top */
+  padding: 16px 0 10px 0;
+  margin: -24px 0 0 0;
+  background: var(--surface);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
   z-index: 5;
-}
-
-/* Settings overlay — фон не размытый, чтобы видна была раскладка под ним. */
-#settings-overlay {
-  background: rgba(0, 0, 0, 0.92);
 }
 
 .overlay-header {
