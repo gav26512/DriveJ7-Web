@@ -4,18 +4,17 @@
 (() => {
   const overlay = document.getElementById('settings-overlay');
   const closeBtn = document.getElementById('settings-close');
-  const openBtn = document.getElementById('btn-settings');
 
   const themeSelect = document.getElementById('setting-theme');
   const langSelect = document.getElementById('setting-lang');
   const brightInput = document.getElementById('setting-brightness');
 
-  function open() { overlay.classList.remove('hidden'); }
-  function close() { overlay.classList.add('hidden'); }
+  function close() { overlay?.classList.add('hidden'); }
 
-  openBtn.addEventListener('click', open);
-  closeBtn.addEventListener('click', close);
-  overlay.addEventListener('click', (e) => {
+  // Open-кнопка живёт в climate-strip (#btn-config) — wire'ится в climate.js.
+  // Здесь обрабатываем только close и клик по фону overlay.
+  closeBtn?.addEventListener('click', close);
+  overlay?.addEventListener('click', (e) => {
     if (e.target === overlay) close();
   });
 
