@@ -258,6 +258,19 @@
     });
   });
 
+  // Fan segments — тап по конкретному сегменту = установить fan на этот уровень.
+  // Уровни 1..10 (индекс span'а + 1). Имя команды: `fan_<N>` (placeholder, как у seat heat).
+  const fanSegments = document.querySelectorAll('#fan-segments span');
+  fanSegments.forEach((seg, idx) => {
+    seg.style.cursor = 'pointer';
+    seg.addEventListener('click', () => {
+      const level = idx + 1;
+      state.fan = level;
+      updateAllVisuals();
+      runIfAvailable(`fan_${level}`);
+    });
+  });
+
   // M-memory
   document.querySelectorAll('[data-mem]').forEach((btn) => {
     btn.addEventListener('click', () => {

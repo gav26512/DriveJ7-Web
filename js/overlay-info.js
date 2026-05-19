@@ -30,6 +30,7 @@
   }
 
   function renderRpm(v) {
+    if (!rpmEl) return;  // pill спрятан — пропускаем
     if (typeof v !== 'number' || !isFinite(v)) {
       rpmEl.firstChild.nodeValue = '---- ';
       return;
