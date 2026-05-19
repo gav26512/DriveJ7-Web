@@ -90,6 +90,15 @@
   window.config = load();
   window.configApi = { apply, set, DEFAULTS };
 
+  // Применяем accent сразу при загрузке (до settings.js), иначе на 100-200ms
+  // мелькает default цвет.
+  try {
+    const accent = localStorage.getItem('accent-color');
+    if (accent && accent !== 'auto') {
+      document.documentElement.style.setProperty('--accent', accent);
+    }
+  } catch (e) {}
+
   // Apply на DOMContentLoaded чтобы элементы существовали.
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', apply);

@@ -61,6 +61,31 @@
   applyI18nAttributes();
   window.addEventListener('langChanged', applyI18nAttributes);
 
+  // ============================== Accent color palette
+  // 'auto' → использовать default профиля (CSS правило body.profile-*).
+  // конкретный HEX → переопределить --accent на :root.
+  const ACCENT_KEY = 'accent-color';
+  function applyAccent(value) {
+    if (value === 'auto' || !value) {
+      document.documentElement.style.removeProperty('--accent');
+    } else {
+      document.documentElement.style.setProperty('--accent', value);
+    }
+  }
+  const savedAccent = localStorage.getItem(ACCENT_KEY) || 'auto';
+  applyAccent(savedAccent);
+
+  document.querySelectorAll('.accent-swatch').forEach((btn) => {
+    if (btn.dataset.accent === savedAccent) btn.classList.add('active');
+    btn.addEventListener('click', () => {
+      const val = btn.dataset.accent;
+      document.querySelectorAll('.accent-swatch').forEach((b) => b.classList.remove('active'));
+      btn.classList.add('active');
+      applyAccent(val);
+      localStorage.setItem(ACCENT_KEY, val);
+    });
+  });
+
   // ============================== Player auto-launch
   const playerSelect = document.getElementById('setting-player');
   function reloadPlayerOptions() {
