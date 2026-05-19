@@ -83,6 +83,63 @@
       'voditel_seat_1', 'voditel_seat_2', 'voditel_seat_3',
     ];
 
+    /**
+     * Применяет runEnum-команду к stubCar чтоб следующий getCarData отдавал
+     * актуальное состояние (иначе syncFromCarData в climate.js затрёт наш
+     * optimistic state обратно в нули).
+     */
+    function applyStubEnum(name) {
+      // Level commands: name_L (1/2/3) или name_0/name_off (off).
+      const lvlMatch = name.match(/^(.+?)_(0|1|2|3|off)$/);
+      if (lvlMatch) {
+        const base = lvlMatch[1];
+        const v = lvlMatch[2] === 'off' ? 0 : Number(lvlMatch[2]);
+        const map = {
+          heat_seat_l:      ['seats', 'front', 'driverHeat'],
+          heat_seat_r:      ['seats', 'front', 'passengerHeat'],
+          heat_zad_seat_l:  ['seats', 'rear', 'leftHeat'],
+          heat_zad_seat_r:  ['seats', 'rear', 'rightHeat'],
+          vent_seat_l:      ['seats', 'front', 'driverVent'],
+          vent_seat_r:      ['seats', 'front', 'passengerVent'],
+          fan:              ['vehicle', 'fan'],
+        };
+        const path = map[base];
+        if (path) {
+          let obj = stubCar;
+          for (let i = 0; i < path.length - 1; i++) obj = obj[path[i]];
+          obj[path[path.length - 1]] = v;
+        }
+      }
+      // T-stepper: temp_driver_up/down, temp_passenger_up/down
+      const tempMatch = name.match(/^temp_(driver|passenger)_(up|down)$/);
+      if (tempMatch) {
+        const field = tempMatch[1] === 'driver' ? 'driverTemp' : 'passengerTemp';
+        const dir = tempMatch[2] === 'up' ? 1 : -1;
+        stubCar.heat[field] = Math.max(16, Math.min(31, (stubCar.heat[field] || 22) + dir));
+        return;
+      }
+      // Toggle (binary): *_on / *_off / *_On / *_Off
+      const togMatch = name.match(/^(.+)_(on|off|On|Off)$/);
+      if (togMatch && !lvlMatch) {
+        const base = togMatch[1];
+        const v = /on/i.test(togMatch[2]);
+        const map = {
+          heat_windshield: ['heat', 'lobHeat'],
+          heat_rearwindow: ['heat', 'zadHeat'],
+          heat_wheel:      ['heat', 'rulHeat'],
+          Recirculation:   ['vehicle', 'recirc'],
+          AUTO:            ['vehicle', 'auto'],
+          AC:              ['vehicle', 'ac'],
+        };
+        const path = map[base];
+        if (path) {
+          let obj = stubCar;
+          for (let i = 0; i < path.length - 1; i++) obj = obj[path[i]];
+          obj[path[path.length - 1]] = v ? 1 : 0;
+        }
+      }
+    }
+
     window.androidApi = {
       onJsReady: (t) => console.debug('[stub] onJsReady', t),
       onClose: (t) => console.debug('[stub] onClose', t),
@@ -110,6 +167,7 @@
       getRunEnumPic: (t, name) => '',
       runEnum: (t, name) => {
         console.debug('[stub] runEnum', name);
+        applyStubEnum(name);
         return JSON.stringify({ ok: true });
       },
       getFileList: () => JSON.stringify([]),
