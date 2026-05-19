@@ -70,7 +70,6 @@
       <div class="t-stepper" id="t-driver-stepper">
         <button class="t-step-btn" data-step="driver_up" aria-label="T+">+</button>
         <div class="t-value">
-          <div class="t-label">DRV</div>
           <div class="t-current" id="t-driver-value">22°</div>
         </div>
         <button class="t-step-btn" data-step="driver_down" aria-label="T-">−</button>
@@ -104,7 +103,6 @@
       <div class="t-stepper" id="t-pass-stepper">
         <button class="t-step-btn" data-step="passenger_up" aria-label="T+">+</button>
         <div class="t-value">
-          <div class="t-label">PASS</div>
           <div class="t-current" id="t-passenger-value">22°</div>
         </div>
         <button class="t-step-btn" data-step="passenger_down" aria-label="T-">−</button>
@@ -142,7 +140,7 @@
         <input type="range" id="setting-brightness" min="0" max="100" value="80">
       </div>
       <div class="settings-row settings-row-col">
-        <label>Подсветка</label>
+        <label data-i18n="settings.accent">Подсветка</label>
         <div class="accent-palette" id="accent-palette">
           <button class="accent-swatch" data-accent="auto"    title="По профилю">A</button>
           <button class="accent-swatch" data-accent="#FFB55B" style="background:#FFB55B" title="Янтарь"></button>
@@ -159,76 +157,76 @@
         </div>
       </div>
       <div class="settings-row">
-        <label>Профиль машины</label>
+        <label data-i18n="settings.profile">Профиль машины</label>
         <select id="setting-profile">
-          <option value="auto">Автоопределение</option>
+          <option value="auto" data-i18n="settings.profile_auto">Автоопределение</option>
           <option value="j7">Jaecoo J7</option>
           <option value="j8">Jaecoo J8</option>
           <option value="tiggo9">Chery Tiggo 9</option>
-          <option value="generic">Generic</option>
+          <option value="generic" data-i18n="settings.profile_generic">Generic</option>
         </select>
       </div>
       <div class="settings-row">
-        <label>Плеер по умолчанию</label>
+        <label data-i18n="settings.player">Плеер по умолчанию</label>
         <select id="setting-player">
-          <option value="">Не выбран</option>
+          <option value="" data-i18n="settings.player_none">Не выбран</option>
           <!-- options заполняются JS-ом из playerDetect.detectInstalled() -->
         </select>
       </div>
 
-      <div class="settings-section">Плавающие виджеты</div>
+      <div class="settings-section" data-i18n="settings.sec_widgets">Плавающие виджеты</div>
       <div class="settings-row">
-        <label for="cfg-w-wifi">WiFi</label>
+        <label for="cfg-w-wifi" data-i18n="settings.w_wifi">WiFi</label>
         <input type="checkbox" id="cfg-w-wifi">
       </div>
       <div class="settings-row">
-        <label for="cfg-w-dt">Дата и время</label>
+        <label for="cfg-w-dt" data-i18n="settings.w_dt">Дата и время</label>
         <input type="checkbox" id="cfg-w-dt" checked>
       </div>
       <div class="settings-row">
-        <label for="cfg-w-temp">T за бортом</label>
+        <label for="cfg-w-temp" data-i18n="settings.w_temp">T за бортом</label>
         <input type="checkbox" id="cfg-w-temp" checked>
       </div>
 
-      <div class="settings-section">Кнопки климата</div>
+      <div class="settings-section" data-i18n="settings.sec_climate">Кнопки климата</div>
       <div class="settings-row">
-        <label for="cfg-two-zone">Двухзонный климат (T пасс.)</label>
+        <label for="cfg-two-zone" data-i18n="settings.two_zone">Двухзонный климат (T пасс.)</label>
         <input type="checkbox" id="cfg-two-zone" checked>
       </div>
       <div class="settings-row">
-        <label for="cfg-auto">AUTO</label>
+        <label for="cfg-auto" data-i18n="settings.auto_btn">AUTO</label>
         <input type="checkbox" id="cfg-auto" checked>
       </div>
       <div class="settings-row">
-        <label for="cfg-recirc">Рециркуляция</label>
+        <label for="cfg-recirc" data-i18n="settings.recirc_btn">Рециркуляция</label>
         <input type="checkbox" id="cfg-recirc" checked>
       </div>
       <div class="settings-row">
-        <label for="cfg-front-glass">Обогрев лоб. стекла</label>
+        <label for="cfg-front-glass" data-i18n="settings.front_glass">Обогрев лоб. стекла</label>
         <input type="checkbox" id="cfg-front-glass" checked>
       </div>
       <div class="settings-row">
-        <label for="cfg-rear-glass">Обогрев задн. стекла</label>
+        <label for="cfg-rear-glass" data-i18n="settings.rear_glass">Обогрев задн. стекла</label>
         <input type="checkbox" id="cfg-rear-glass" checked>
       </div>
       <div class="settings-row">
-        <label for="cfg-steer-heat">Подогрев руля</label>
+        <label for="cfg-steer-heat" data-i18n="settings.steer_heat">Подогрев руля</label>
         <input type="checkbox" id="cfg-steer-heat" checked>
       </div>
       <div class="settings-row">
-        <label for="cfg-rear-seat">Подогрев задних сидений</label>
+        <label for="cfg-rear-seat" data-i18n="settings.rear_seat">Подогрев задних сидений</label>
         <input type="checkbox" id="cfg-rear-seat" checked>
       </div>
       <div class="settings-row">
-        <label for="cfg-vent-drv">Обдув сиденья (водитель)</label>
+        <label for="cfg-vent-drv" data-i18n="settings.vent_drv">Обдув сиденья (водитель)</label>
         <input type="checkbox" id="cfg-vent-drv" checked>
       </div>
       <div class="settings-row">
-        <label for="cfg-vent-pass">Обдув сиденья (пассажир)</label>
+        <label for="cfg-vent-pass" data-i18n="settings.vent_pass">Обдув сиденья (пассажир)</label>
         <input type="checkbox" id="cfg-vent-pass" checked>
       </div>
 
-      <div class="settings-section">Память сидений водителя</div>
+      <div class="settings-section" data-i18n="settings.sec_memory">Память сидений водителя</div>
       <div class="settings-row">
         <label for="cfg-mem1">В1</label>
         <input type="checkbox" id="cfg-mem1" checked>
