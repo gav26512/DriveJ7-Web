@@ -66,9 +66,21 @@ DriveJ7-Web/
 
 ## Установка на ГУ
 
-Через интерфейс JCarTools — выбрать zip-архив с этого репозитория. См. репо
-[`JCarTools/core_manifest`](https://github.com/JCarTools/core_manifest) для документации
-API.
+1. Скачать актуальный `drive-j7-web-v*.zip` из корня репо (или из Releases).
+2. В JCarTools интерфейсе → выбор web-расширения → указать этот zip.
+3. JCarTools распакует и установит как extension с id `drive_j7_web`.
+
+См. репо [`JCarTools/core_manifest`](https://github.com/JCarTools/core_manifest)
+для документации API.
+
+### Сборка zip из исходников
+
+```bash
+cd DriveJ7-Web
+zip -r drive-j7-web-v$(node -p "require('./manifest.json').version").zip \
+  manifest.json index.html css js icons img \
+  -x "*.DS_Store" "*/.idea/*"
+```
 
 ## Лицензия
 

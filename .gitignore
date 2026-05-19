@@ -5,3 +5,4 @@ node_modules/
 dist/
 *.zip
 !default_web_black.zip
+!drive-j7-web-*.zip
