@@ -153,18 +153,31 @@
       }
     }
 
-    container.addEventListener('pointerdown', onPointerDown);
-    container.addEventListener('click', onClickCapture, true);  // capture phase
+    // Listen on document (а не container) — pointerdown надёжнее ловится в
+    // capture phase на самом верху иерархии. Внутри onPointerDown проверяем
+    // что target внутри container.
+    document.addEventListener('pointerdown', onPointerDown, true);
+    document.addEventListener('click', onClickCapture, true);
     window.addEventListener('pointermove', onPointerMove);
     window.addEventListener('pointerup', onPointerUp);
     window.addEventListener('pointercancel', onPointerUp);
 
+    // Диагностика — ловим вообще все pointerdown'ы.
+    const diagHandler = (ev) => {
+      const isHvacBtn = ev.target.closest('[data-dnd-id]');
+      const isInGrid = isHvacBtn && container.contains(isHvacBtn);
+      console.log('[dnd-diag] pointerdown target=', ev.target.tagName + '.' + (ev.target.className || ''),
+        ' hvacBtn=', !!isHvacBtn, ' inGrid=', !!isInGrid);
+    };
+    window.addEventListener('pointerdown', diagHandler, true);
+
     return () => {
-      container.removeEventListener('pointerdown', onPointerDown);
-      container.removeEventListener('click', onClickCapture, true);
+      document.removeEventListener('pointerdown', onPointerDown, true);
+      document.removeEventListener('click', onClickCapture, true);
       window.removeEventListener('pointermove', onPointerMove);
       window.removeEventListener('pointerup', onPointerUp);
       window.removeEventListener('pointercancel', onPointerUp);
+      window.removeEventListener('pointerdown', diagHandler, true);
     };
   }
 
