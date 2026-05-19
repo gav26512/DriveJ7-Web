@@ -190,6 +190,25 @@
       window.onAndroidEvent?.('gps', { lat: 55.75, lon: 37.61, speed: 0, heading: 0 });
     }, 100);
 
+    /**
+     * Хелпер для теста push-event'ов из DevTools console:
+     *   stubEmit('climateState')    — стрельнуть обновлением после ручной правки stubCar
+     *   stubSet('seats.front.driverHeat', 2)  — изменить значение и автоматически стрельнуть event
+     * Используется для имитации "физ.кнопка нажата" в браузере.
+     */
+    window.stubEmit = (type, data) => {
+      window.onAndroidEvent?.(type, data || {});
+      console.log('[stub] emitted', type, data || '');
+    };
+    window.stubSet = (path, value) => {
+      const parts = path.split('.');
+      let obj = stubCar;
+      for (let i = 0; i < parts.length - 1; i++) obj = obj[parts[i]];
+      obj[parts[parts.length - 1]] = value;
+      window.onAndroidEvent?.('climateState', {});
+      console.log('[stub] set', path, '=', value, '→ fired climateState');
+    };
+
     // Периодически "обновляем" RPM/speed чтобы было видно живые виджеты
     let demoRpm = 850;
     setInterval(() => {

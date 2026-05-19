@@ -287,7 +287,10 @@
     document.getElementById('settings-overlay')?.classList.remove('hidden');
   });
 
-  // ============================== Sync from getCarData (real read state)
+  // ============================== Sync from getCarData (полное чтение)
+  // Тянем состояния всех контролов из системы. Если хост даёт climateState event —
+  // см. ниже подписку, обновления приходят push'ем. Poll каждые 2 сек как
+  // fallback на случай если event не пришёл.
   function syncFromCarData() {
     const heat = api.getCarData('heat');
     if (heat) {
@@ -310,8 +313,32 @@
       state.vents.drv = Number(seats.front?.driverVent) || 0;
       state.vents.pass = Number(seats.front?.passengerVent) || 0;
     }
+    // Vehicle: auto/ac/recirc/fan/mem. В core_manifest эти поля не задокументированы,
+    // но в нашем stub лежат там; если реальный JCarTools отдаёт их в vehicle — тоже подхватим.
+    const vehicle = api.getCarData('vehicle');
+    if (vehicle) {
+      if (typeof vehicle.auto !== 'undefined')     state.auto    = !!vehicle.auto;
+      if (typeof vehicle.ac !== 'undefined')       state.ac      = !!vehicle.ac;
+      if (typeof vehicle.recirc !== 'undefined')   state.recirc  = !!vehicle.recirc;
+      if (typeof vehicle.fan === 'number')         state.fan     = Math.max(0, Math.min(10, vehicle.fan));
+      if (typeof vehicle.memorySlot === 'number')  state.mem     = vehicle.memorySlot;
+    }
     updateAllVisuals();
   }
+
+  /**
+   * Push-обновление: хост шлёт event 'climateState' когда что-то меняется
+   * (физ.кнопки, штатная шторка, AUTO регулирование). Тот же объект что вернул бы
+   * getCarData('all') — обновляем стейт и UI мгновенно.
+   *
+   * В StreletS27 эта подписка используется тем же паттерном — каждый модуль
+   * слушает свой кусок состояния.
+   */
+  api.on('climateState', () => {
+    syncFromCarData();
+  });
+  api.on('seats', () => syncFromCarData());
+  api.on('heat', () => syncFromCarData());
 
   // ============================== Init
   loadAvailable();
