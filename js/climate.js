@@ -182,7 +182,9 @@
       btn.appendChild(dots);
     }
     // Дизейбл если ни одна из cmd-вариаций кнопки не в availableCmds.
-    if (availableCmds.size > 0 && def.cmd) {
+    // В browser stub режиме (api.isHost=false) НЕ дизейблим — stub возвращает
+    // ограниченный список, реальный хост даст полный набор.
+    if (api.isHost && availableCmds.size > 0 && def.cmd) {
       const allCmds = def.type === 'toggle'
         ? [def.cmd.on, def.cmd.off]
         : [def.cmd.off, `${def.cmd.base}_1`, `${def.cmd.base}_2`, `${def.cmd.base}_3`];

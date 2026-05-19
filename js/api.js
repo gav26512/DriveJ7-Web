@@ -59,7 +59,29 @@
       { package: 'com.example.podcasts', label: 'Подкасты' },
     ];
 
-    const stubEnums = ['MEDIA_PREV', 'MEDIA_NEXT', 'MEDIA_PLAY_PAUSE'];
+    const stubEnums = [
+      'MEDIA_PREV', 'MEDIA_NEXT', 'MEDIA_PLAY_PAUSE',
+      // HVAC toggle (binary)
+      'AUTO_On', 'AUTO_Off', 'AC_On', 'AC_Off',
+      'Recirculation_On', 'Recirculation_Off',
+      'heat_windshield_on', 'heat_windshield_off',
+      'heat_rearwindow_on', 'heat_rearwindow_off',
+      'heat_wheel_on', 'heat_wheel_off',
+      // HVAC level (0/1/2/3) — сидения подогрев + вентиляция
+      'heat_seat_l_0', 'heat_seat_l_1', 'heat_seat_l_2', 'heat_seat_l_3',
+      'heat_seat_r_0', 'heat_seat_r_1', 'heat_seat_r_2', 'heat_seat_r_3',
+      'heat_zad_seat_l_0', 'heat_zad_seat_l_1', 'heat_zad_seat_l_2', 'heat_zad_seat_l_3',
+      'heat_zad_seat_r_off', 'heat_zad_seat_r_1', 'heat_zad_seat_r_2', 'heat_zad_seat_r_3',
+      'vent_seat_l_0', 'vent_seat_l_1', 'vent_seat_l_2', 'vent_seat_l_3',
+      'vent_seat_r_0', 'vent_seat_r_1', 'vent_seat_r_2', 'vent_seat_r_3',
+      // Fan + memory + T (placeholder names)
+      'fan_1', 'fan_2', 'fan_3', 'fan_4', 'fan_5',
+      'fan_6', 'fan_7', 'fan_8', 'fan_9', 'fan_10',
+      'fan_up', 'fan_down',
+      'temp_driver_up', 'temp_driver_down',
+      'temp_passenger_up', 'temp_passenger_down',
+      'voditel_seat_1', 'voditel_seat_2', 'voditel_seat_3',
+    ];
 
     window.androidApi = {
       onJsReady: (t) => console.debug('[stub] onJsReady', t),
