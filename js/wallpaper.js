@@ -12,6 +12,22 @@
   const INDEX_KEY = 'wallpaper-index';
   const MODE_KEY  = 'wallpaper-mode';   // 'bing' / 'black'
 
+  // Dev-фолбэк: десктоп Chrome не получает CORS-headers от Bing API, fetch падает.
+  // Сами картинки (CDN) грузятся через background-image без CORS — поэтому
+  // достаточно захардкодить актуальные URL'ы. На ГУ Android WebView CORS не
+  // применяет, fetchBing работает, этот список не используется.
+  // Обновлять раз в несколько месяцев когда Bing CDN перестанет отдавать.
+  const FALLBACK_URLS = [
+    'https://www.bing.com/th?id=OHR.BumbleBee_ROW7621208242_1920x1080.jpg&rf=LaDigue_1920x1080.jpg&pid=hp',
+    'https://www.bing.com/th?id=OHR.SpainLighthouse_ROW0931685772_1920x1080.jpg&rf=LaDigue_1920x1080.jpg&pid=hp',
+    'https://www.bing.com/th?id=OHR.NPFortnight2026_ROW9483729156_1920x1080.jpg&rf=LaDigue_1920x1080.jpg&pid=hp',
+    'https://www.bing.com/th?id=OHR.ShenandoahSunset_ROW7042145908_1920x1080.jpg&rf=LaDigue_1920x1080.jpg&pid=hp',
+    'https://www.bing.com/th?id=OHR.SmithRockPark_ROW6845039893_1920x1080.jpg&rf=LaDigue_1920x1080.jpg&pid=hp',
+    'https://www.bing.com/th?id=OHR.EndangeredWhales_ROW6081633589_1920x1080.jpg&rf=LaDigue_1920x1080.jpg&pid=hp',
+    'https://www.bing.com/th?id=OHR.Pitigliano_ROW4097720054_1920x1080.jpg&rf=LaDigue_1920x1080.jpg&pid=hp',
+    'https://www.bing.com/th?id=OHR.AlabamaHills_ROW6449052938_1920x1080.jpg&rf=LaDigue_1920x1080.jpg&pid=hp',
+  ];
+
   const wallpaperEl = document.getElementById('wallpaper');
 
   let urls = [];     // массив абсолютных URL'ов
@@ -24,7 +40,8 @@
       return;
     }
     wallpaperEl.style.background = '';
-    wallpaperEl.style.backgroundImage = `url(${url})`;
+    // Кавычки внутри url() — иначе амперсанды в Bing URL ломают CSS-парсер.
+    wallpaperEl.style.backgroundImage = `url("${url}")`;
   }
 
   function applyCurrent() {
@@ -36,7 +53,8 @@
     applyUrl(urls[idx]);
   }
 
-  /** Загрузить список из Bing API. CORS обычно открыт у bing.com. */
+  /** Загрузить список из Bing API. На ГУ WebView CORS не применяется и работает;
+   *  в десктопном Chrome CORS блокирует — переключаемся на FALLBACK_URLS. */
   async function fetchBing() {
     try {
       const r = await fetch(BING_API);
@@ -52,7 +70,12 @@
         console.info('[wallpaper] loaded', urls.length, 'images from Bing');
       }
     } catch (e) {
-      console.warn('[wallpaper] Bing API fetch failed:', e.message);
+      console.warn('[wallpaper] Bing API fetch failed (CORS в браузере — норма для dev):', e.message);
+      if (urls.length === 0) {
+        urls = FALLBACK_URLS.slice();
+        localStorage.setItem(CACHE_KEY, JSON.stringify(urls));
+        console.info('[wallpaper] using dev fallback list, n=', urls.length);
+      }
     }
   }
 
@@ -84,11 +107,12 @@
 
   applyCurrent();
 
-  // 2. Свежий запрос к Bing (асинхронно, не блокирует UI). На JCarTools-хосте
-  // тоже работает — у Android WebView CORS обычно отключён для нативных WebView'ов.
+  // 2. Свежий запрос к Bing (асинхронно, не блокирует UI). В браузере CORS
+  // блокирует, fetchBing внутри переключится на FALLBACK_URLS. После — всегда
+  // переприменяем (кроме black-mode), даже если в DOM уже стоит градиент:
+  // style.background мог затереть backgroundImage и проверка по нему ненадёжна.
   fetchBing().then(() => {
-    // Если ещё не показывали фон (urls был пустой) — применяем теперь.
-    if (urls.length > 0 && !wallpaperEl.style.backgroundImage && localStorage.getItem(MODE_KEY) !== 'black') {
+    if (urls.length > 0 && localStorage.getItem(MODE_KEY) !== 'black') {
       applyCurrent();
     }
   });

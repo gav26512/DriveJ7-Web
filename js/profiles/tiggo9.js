@@ -12,6 +12,8 @@
     id: 'tiggo9',
     name: 'Chery Tiggo 9',
     bodyClass: 'profile-tiggo9',
+    // Разрешение экрана ГУ Tiggo 9: 2560×1440 QHD landscape.
+    screenSize: { width: 2560, height: 1440 },
     fuelTankLiters: 70,  // ICE; для PHEV-варианта переопределить вручную
     hvac: {
       auto: true,

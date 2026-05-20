@@ -142,4 +142,5 @@
     api.setBrightness(v);
     localStorage.setItem('brightness', String(v));
   });
+
 })();

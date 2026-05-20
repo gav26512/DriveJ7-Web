@@ -74,12 +74,16 @@
       'heat_zad_seat_r_off', 'heat_zad_seat_r_1', 'heat_zad_seat_r_2', 'heat_zad_seat_r_3',
       'vent_seat_l_0', 'vent_seat_l_1', 'vent_seat_l_2', 'vent_seat_l_3',
       'vent_seat_r_0', 'vent_seat_r_1', 'vent_seat_r_2', 'vent_seat_r_3',
-      // Fan + memory + T (placeholder names)
+      // Fan (placeholder — в манифесте JCarTools отсутствует, имя выясняется)
       'fan_1', 'fan_2', 'fan_3', 'fan_4', 'fan_5',
       'fan_6', 'fan_7', 'fan_8', 'fan_9', 'fan_10',
       'fan_up', 'fan_down',
-      'temp_driver_up', 'temp_driver_down',
-      'temp_passenger_up', 'temp_passenger_down',
+      // T-степперы — точные имена из JCarTools/core_manifest
+      'Driver_Temp_Up', 'Driver_Temp_Down',
+      'Passenger_Temp_Up', 'Passenger_Temp_Down',
+      // Громкость — из манифеста
+      'Volume_Up', 'Volume_Down',
+      // Память сидений — из манифеста
       'voditel_seat_1', 'voditel_seat_2', 'voditel_seat_3',
     ];
 
@@ -125,11 +129,14 @@
           obj[path[path.length - 1]] = v;
         }
       }
-      // T-stepper: temp_driver_up/down, temp_passenger_up/down
-      const tempMatch = name.match(/^temp_(driver|passenger)_(up|down)$/);
+      // Громкость — Volume_Up/Volume_Down (из манифеста).
+      if (name === 'Volume_Up')   { stubState.volume = Math.min(100, stubState.volume + 5); return; }
+      if (name === 'Volume_Down') { stubState.volume = Math.max(0,   stubState.volume - 5); return; }
+      // T-stepper из JCarTools/core_manifest: Driver_Temp_Up/Down, Passenger_Temp_Up/Down.
+      const tempMatch = name.match(/^(Driver|Passenger)_Temp_(Up|Down)$/);
       if (tempMatch) {
-        const field = tempMatch[1] === 'driver' ? 'driverTemp' : 'passengerTemp';
-        const dir = tempMatch[2] === 'up' ? 1 : -1;
+        const field = tempMatch[1] === 'Driver' ? 'driverTemp' : 'passengerTemp';
+        const dir = tempMatch[2] === 'Up' ? 1 : -1;
         stubCar.heat[field] = Math.max(16, Math.min(31, (stubCar.heat[field] || 22) + dir));
         return;
       }
@@ -161,8 +168,8 @@
       onSettings: (t) => console.debug('[stub] onSettings', t),
       setBright: (t, v) => console.debug('[stub] setBright', v),
       setLogFilter: (t, f) => console.debug('[stub] setLogFilter', f),
-      getvol: () => 50,
-      setvol: (t, v) => console.debug('[stub] setvol', v),
+      getvol: () => stubState.volume,
+      setvol: (t, v) => { stubState.volume = Math.max(0, Math.min(100, v|0)); console.debug('[stub] setvol', stubState.volume); },
       getCarData: (t, name) => {
         if (!name || name === 'all' || name === 'car' || name === 'state') {
           return JSON.stringify(stubCar);
@@ -189,21 +196,75 @@
       getFile: (t, name) => '',
     };
 
-    // Эмуляция событий для отладки UI.
+    // ============================== Stub player (browser dev only)
+    // Эмуляция реального ГУ: список треков, текущая позиция и громкость живут
+    // в браузере. Кнопки plr/prev/next/play/pause/volume в music.js при
+    // !api.isHost дёргают stubPlayer.* напрямую — это даёт работоспособный
+    // плеер в dev-режиме без зависимости от runEnum.
+    const stubTracks = [
+      { SongName: 'Demo Track #1', SongArtist: 'Stub Artist', SongAlbum: 'Demo Album', SongAlbumPicture: '', Trdur: 180 },
+      { SongName: 'Demo Track #2', SongArtist: 'Stub Artist', SongAlbum: 'Demo Album', SongAlbumPicture: '', Trdur: 210 },
+      { SongName: 'Demo Track #3', SongArtist: 'Another Artist', SongAlbum: 'Best Of', SongAlbumPicture: '', Trdur: 165 },
+      { SongName: 'Demo Track #4', SongArtist: 'Another Artist', SongAlbum: 'Best Of', SongAlbumPicture: '', Trdur: 240 },
+    ];
+    const stubState = { idx: 0, pos: 0, playing: true, volume: 50 };
+
+    function emitMusicInfo() {
+      const t = stubTracks[stubState.idx];
+      window.onAndroidEvent?.('musicInfo', {
+        PlayStat: stubState.playing ? 'play' : 'pause',
+        SongName: t.SongName,
+        SongArtist: t.SongArtist,
+        SongAlbum: t.SongAlbum,
+        SongAlbumPicture: t.SongAlbumPicture,
+        Trpos: stubState.pos,
+        Trdur: t.Trdur,
+      });
+    }
+
+    window.stubPlayer = {
+      prev() {
+        stubState.idx = (stubState.idx - 1 + stubTracks.length) % stubTracks.length;
+        stubState.pos = 0;
+        stubState.playing = true;
+        emitMusicInfo();
+      },
+      next() {
+        stubState.idx = (stubState.idx + 1) % stubTracks.length;
+        stubState.pos = 0;
+        stubState.playing = true;
+        emitMusicInfo();
+      },
+      toggle() {
+        stubState.playing = !stubState.playing;
+        emitMusicInfo();
+      },
+      volUp() { stubState.volume = Math.min(100, stubState.volume + 5); console.debug('[stub] volume', stubState.volume); },
+      volDown(){ stubState.volume = Math.max(0,   stubState.volume - 5); console.debug('[stub] volume', stubState.volume); },
+      getVolume() { return stubState.volume; },
+    };
+
+    // Эмуляция начального снапшота состояний.
     setTimeout(() => {
       window.onAndroidEvent?.('theme', { mode: 'dark' });
-      window.onAndroidEvent?.('musicInfo', {
-        PlayStat: 'play',
-        SongName: 'Demo Track',
-        SongArtist: 'Stub Artist',
-        SongAlbum: 'Demo Album',
-        SongAlbumPicture: '',
-        Trpos: 42,
-        Trdur: 180,
-      });
+      emitMusicInfo();
       window.onAndroidEvent?.('weather', { temp: 22, icon: 'sun' });
       window.onAndroidEvent?.('gps', { lat: 55.75, lon: 37.61, speed: 0, heading: 0 });
     }, 100);
+
+    // Тикалка прогресса трека. Каждую секунду inc'аем pos, на конце трека —
+    // авто-переключение на следующий (как делает любой плеер). Только когда
+    // PlayStat=play, чтобы пауза реально останавливала прогресс.
+    setInterval(() => {
+      if (!stubState.playing) return;
+      const t = stubTracks[stubState.idx];
+      stubState.pos++;
+      if (stubState.pos >= t.Trdur) {
+        stubState.idx = (stubState.idx + 1) % stubTracks.length;
+        stubState.pos = 0;
+      }
+      emitMusicInfo();
+    }, 1000);
 
     /**
      * Хелпер для теста push-event'ов из DevTools console:

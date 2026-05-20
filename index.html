@@ -80,8 +80,11 @@
         <!-- Сетка HVAC-кнопок — рендерится из climate.js, поддерживает DnD -->
         <div class="hvac-grid" id="hvac-grid"></div>
 
-        <!-- Fan + memory row под сеткой -->
+        <!-- Memory row под сеткой. Fan-bar скрыт: имена enum'ов вентилятора     -->
+        <!-- (fan_up/down/N) отсутствуют в JCarTools/core_manifest — нечем     -->
+        <!-- управлять. Вернуть когда узнаем реальные имена.                     -->
         <div class="fan-mem-row">
+          <!--
           <span class="fan-label">MIN</span>
           <div class="fan-bar-inline">
             <button class="fan-edge" data-step="fan_down" aria-label="Fan-">−</button>
@@ -92,6 +95,7 @@
             <button class="fan-edge" data-step="fan_up" aria-label="Fan+">+</button>
           </div>
           <span class="fan-label">MAX</span>
+          -->
           <button class="mem-btn active" data-mem="1">В1</button>
           <button class="mem-btn" data-mem="2">В2</button>
           <button class="mem-btn" data-mem="3">В3</button>
@@ -193,10 +197,7 @@
         <label for="cfg-two-zone" data-i18n="settings.two_zone">Двухзонный климат (T пасс.)</label>
         <input type="checkbox" id="cfg-two-zone" checked>
       </div>
-      <div class="settings-row">
-        <label for="cfg-auto" data-i18n="settings.auto_btn">AUTO</label>
-        <input type="checkbox" id="cfg-auto" checked>
-      </div>
+      <!-- AUTO toggle убран вместе с кнопкой — её нет в JCarTools/core_manifest. -->
       <div class="settings-row">
         <label for="cfg-recirc" data-i18n="settings.recirc_btn">Рециркуляция</label>
         <input type="checkbox" id="cfg-recirc" checked>
@@ -240,7 +241,7 @@
         <input type="checkbox" id="cfg-mem3" checked>
       </div>
       <div class="settings-row about" data-i18n="settings.about">О приложении</div>
-      <div class="about-text">Drive J7 web · v0.2.0 · gav26512/DriveJ7-Web</div>
+      <div class="about-text">Drive J7 web · v0.3.1 · gav26512/DriveJ7-Web</div>
     </div>
   </div>
 

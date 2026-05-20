@@ -10,6 +10,8 @@
     id: 'j8',
     name: 'Jaecoo J8',
     bodyClass: 'profile-j8',
+    // Разрешение экрана ГУ Jaecoo J8: 1920×1200 dp (landscape).
+    screenSize: { width: 1920, height: 1200 },
     fuelTankLiters: null,
     hvac: {
       auto: true,

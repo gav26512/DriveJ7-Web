@@ -21,12 +21,12 @@
   // оставляем placeholder-имена с TODO, конкретные нужно уточнить у автора JCarTools.
 
   const BUTTONS = [
-    // AUTO — только включает. Выключение приходит через climateState event
-    // (когда юзер вручную крутит T/Fan, ECU выключает AUTO сам). См. native
-    // MainActivity.kt: `if (autoOn) return@ClimateToggle`.
-    { id: 'auto',          type: 'toggle', stateKey: 'auto',          icon: 'auto',          cmd: { on: 'AUTO_On',           off: 'AUTO_Off' },           title: 'Авто', onlyOn: true },
+    // TODO: AUTO и AC временно скрыты — соответствующие enum'ы (AUTO_On/Off,
+    // AC_On/Off) отсутствуют в JCarTools/core_manifest. Вернуть когда узнаем
+    // реальные имена (через диагностический оверлей → api.getRunEnum()).
+    // { id: 'auto', type: 'toggle', stateKey: 'auto', icon: 'auto', cmd: { on: 'AUTO_On', off: 'AUTO_Off' }, title: 'Авто', onlyOn: true },
+    // { id: 'ac',   type: 'toggle', stateKey: 'ac',   text: 'AC',   cmd: { on: 'AC_On',   off: 'AC_Off'   }, title: 'A/C' },
     { id: 'recirc',        type: 'toggle', stateKey: 'recirc',        icon: 'recirc',        cmd: { on: 'Recirculation_On',  off: 'Recirculation_Off' },  title: 'Рециркуляция' },
-    { id: 'ac',            type: 'toggle', stateKey: 'ac',            text: 'AC',            cmd: { on: 'AC_On',             off: 'AC_Off' },             title: 'A/C' },
     { id: 'front_defrost', type: 'toggle', stateKey: 'front_defrost', icon: 'glass_front',   cmd: { on: 'heat_windshield_on', off: 'heat_windshield_off' }, title: 'Лоб. стекло' },
     { id: 'rear_defrost',  type: 'toggle', stateKey: 'rear_defrost',  icon: 'glass_rear',    cmd: { on: 'heat_rearwindow_on', off: 'heat_rearwindow_off' }, title: 'Зад. стекло' },
     { id: 'steering_heat', type: 'toggle', stateKey: 'steering_heat', icon: 'steer',         cmd: { on: 'heat_wheel_on',     off: 'heat_wheel_off' },     title: 'Подогрев руля' },
@@ -39,15 +39,16 @@
   ];
 
   // Step-команды (T water/passenger/fan up/down) — не в DnD grid, в T-stepper'ах и Fan-bar.
-  // TODO: точные имена для T+/-/Fan+/- уточнить у автора JCarTools — в StreletS27 не нашли.
+  // Имена T-степперов — из JCarTools/core_manifest README.
+  // TODO: fan_up/fan_down в манифесте отсутствуют — реальное имя уточнить отдельно.
   const STEP_CMDS = {
-    driver_up:     'temp_driver_up',
-    driver_down:   'temp_driver_down',
-    passenger_up:  'temp_passenger_up',
-    passenger_down:'temp_passenger_down',
+    driver_up:     'Driver_Temp_Up',
+    driver_down:   'Driver_Temp_Down',
+    passenger_up:  'Passenger_Temp_Up',
+    passenger_down:'Passenger_Temp_Down',
     fan_up:        'fan_up',
     fan_down:      'fan_down',
-    mem_1:         'voditel_seat_1',   // подтверждено в StreletS27
+    mem_1:         'voditel_seat_1',   // подтверждено в JCarTools/core_manifest
     mem_2:         'voditel_seat_2',
     mem_3:         'voditel_seat_3',
   };
@@ -234,9 +235,12 @@
       const def = BUTTONS.find((b) => b.id === btn.dataset.btnId);
       if (def) updateButtonVisual(btn, def);
     }
-    document.getElementById('t-driver-value').textContent = tDisplay(state.tDriver);
-    document.getElementById('t-passenger-value').textContent = tDisplay(state.tPassenger);
-    document.getElementById('fan-segments').dataset.level = String(state.fan);
+    const drvEl = document.getElementById('t-driver-value');
+    if (drvEl) drvEl.textContent = tDisplay(state.tDriver);
+    const passEl = document.getElementById('t-passenger-value');
+    if (passEl) passEl.textContent = tDisplay(state.tPassenger);
+    const fanEl = document.getElementById('fan-segments');
+    if (fanEl) fanEl.dataset.level = String(state.fan);
     for (const btn of document.querySelectorAll('[data-mem]')) {
       btn.classList.toggle('active', Number(btn.dataset.mem) === state.mem);
     }
@@ -298,6 +302,8 @@
   // см. ниже подписку, обновления приходят push'ем. Poll каждые 2 сек как
   // fallback на случай если event не пришёл.
   function syncFromCarData() {
+    // heat: rulHeat, lobHeat, zadHeat, driverTemp, passengerTemp (см. манифест).
+    // typeof-гарды — если поле не пришло, не перетирать optimistic state.
     const heat = api.getCarData('heat');
     if (heat) {
       if (typeof heat.driverTemp === 'number') {
@@ -306,21 +312,40 @@
       if (typeof heat.passengerTemp === 'number') {
         state.tPassenger = Math.max(0, Math.min(17, heat.passengerTemp - 15));
       }
-      state.front_defrost = !!heat.lobHeat;
-      state.rear_defrost = !!heat.zadHeat;
-      state.steering_heat = !!heat.rulHeat;
+      if (typeof heat.lobHeat !== 'undefined') state.front_defrost = !!heat.lobHeat;
+      if (typeof heat.zadHeat !== 'undefined') state.rear_defrost  = !!heat.zadHeat;
+      if (typeof heat.rulHeat !== 'undefined') state.steering_heat = !!heat.rulHeat;
     }
+    // seats: манифест документирует поля seat/heat/vent. Реальный формат — массив
+    // объектов вида [{seat:0|1|2|3, heat:0..3, vent:0..3}, ...] (seat=0 водитель,
+    // 1 пассажир, 2 задний левый, 3 задний правый). Наш browser stub отдаёт
+    // nested-форму {front:{driverHeat,...}, rear:{leftHeat,...}} — поддерживаем оба.
     const seats = api.getCarData('seats');
-    if (seats) {
-      state.seats.drv = Number(seats.front?.driverHeat) || 0;
-      state.seats.pass = Number(seats.front?.passengerHeat) || 0;
-      state.seats.rl = Number(seats.rear?.leftHeat) || 0;
-      state.seats.rr = Number(seats.rear?.rightHeat) || 0;
-      state.vents.drv = Number(seats.front?.driverVent) || 0;
-      state.vents.pass = Number(seats.front?.passengerVent) || 0;
+    if (Array.isArray(seats)) {
+      for (const s of seats) {
+        const idx = Number(s.seat);
+        const h = typeof s.heat !== 'undefined' ? Number(s.heat) || 0 : null;
+        const v = typeof s.vent !== 'undefined' ? Number(s.vent) || 0 : null;
+        if (idx === 0) { if (h !== null) state.seats.drv  = h; if (v !== null) state.vents.drv  = v; }
+        if (idx === 1) { if (h !== null) state.seats.pass = h; if (v !== null) state.vents.pass = v; }
+        if (idx === 2) { if (h !== null) state.seats.rl   = h; }
+        if (idx === 3) { if (h !== null) state.seats.rr   = h; }
+      }
+    } else if (seats && typeof seats === 'object') {
+      if (seats.front) {
+        if (typeof seats.front.driverHeat    !== 'undefined') state.seats.drv  = Number(seats.front.driverHeat)    || 0;
+        if (typeof seats.front.passengerHeat !== 'undefined') state.seats.pass = Number(seats.front.passengerHeat) || 0;
+        if (typeof seats.front.driverVent    !== 'undefined') state.vents.drv  = Number(seats.front.driverVent)    || 0;
+        if (typeof seats.front.passengerVent !== 'undefined') state.vents.pass = Number(seats.front.passengerVent) || 0;
+      }
+      if (seats.rear) {
+        if (typeof seats.rear.leftHeat  !== 'undefined') state.seats.rl = Number(seats.rear.leftHeat)  || 0;
+        if (typeof seats.rear.rightHeat !== 'undefined') state.seats.rr = Number(seats.rear.rightHeat) || 0;
+      }
     }
-    // Vehicle: auto/ac/recirc/fan/mem. В core_manifest эти поля не задокументированы,
-    // но в нашем stub лежат там; если реальный JCarTools отдаёт их в vehicle — тоже подхватим.
+    // Vehicle: auto/ac/recirc/fan/memorySlot в манифесте отсутствуют. Оставляем
+    // typeof-проверки на случай если конкретный билд JCarTools их добавит —
+    // тогда состояние подхватится. Если нет — UI остаётся в optimistic state.
     const vehicle = api.getCarData('vehicle');
     if (vehicle) {
       if (typeof vehicle.auto !== 'undefined')     state.auto    = !!vehicle.auto;
@@ -332,25 +357,17 @@
     updateAllVisuals();
   }
 
-  /**
-   * Push-обновление: хост шлёт event 'climateState' когда что-то меняется
-   * (физ.кнопки, штатная шторка, AUTO регулирование). Тот же объект что вернул бы
-   * getCarData('all') — обновляем стейт и UI мгновенно.
-   *
-   * В StreletS27 эта подписка используется тем же паттерном — каждый модуль
-   * слушает свой кусок состояния.
-   */
-  api.on('climateState', () => {
-    syncFromCarData();
-  });
-  api.on('seats', () => syncFromCarData());
-  api.on('heat', () => syncFromCarData());
+  // Push-событий для климата в JCarTools/core_manifest НЕТ (документированы только
+  // musicInfo, gps, speed, weather, theme, LogData, ping, hud, GPSSignalQuality).
+  // Поэтому обновляемся исключительно polling'ом getCarData каждую секунду —
+  // даёт ~1 сек задержку реакции UI на физ. кнопки / штатную шторку, что для
+  // HVAC приемлемо. Если хост в будущем начнёт слать climateState — добавим подписку.
 
   // ============================== Init
   loadAvailable();
   renderGrid();
   syncFromCarData();
-  setInterval(syncFromCarData, 2000);
+  setInterval(syncFromCarData, 1000);
 
   // Подключаем DnD к hvac-grid.
   console.log('[climate] init: gridEl =', gridEl, ', children =', gridEl?.children.length, ', window.dnd =', typeof window.dnd);

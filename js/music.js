@@ -17,6 +17,10 @@
     return `${m}:${String(s).padStart(2, '0')}`;
   }
 
+  // Запоминаем последний PlayStat — нужен для кнопки play/pause: в JCT нет enum'а
+  // MEDIA_PLAY_PAUSE (одной кнопкой), есть отдельные MEDIA_PLAY и MEDIA_PAUSE.
+  let lastPlayStat = 'pause';
+
   function render(info) {
     if (!info) {
       titleEl.textContent = i18n.t('music.no_track');
@@ -39,25 +43,42 @@
     posEl.textContent = fmtTime(pos);
     durEl.textContent = fmtTime(dur);
     barEl.style.width = dur > 0 ? `${Math.min(100, (pos / dur) * 100)}%` : '0%';
+    if (info.PlayStat) lastPlayStat = String(info.PlayStat).toLowerCase();
+    // Перерисовать значок play/pause кнопки.
+    const playBtn = document.querySelector('.btn-media-play');
+    if (playBtn) playBtn.textContent = lastPlayStat === 'play' ? '⏸' : '▶';
   }
 
-  // Кнопки управления — каждая шлёт runEnum.
+  // Кнопки plr-управления: в browser-stub режиме (!api.isHost) — переключаем
+  // stubPlayer локально, чтобы UI работал без JCT. На ГУ — runEnum (JCT enum'ы:
+  // MEDIA_PREV — нет в манифесте, MEDIA_PLAY/MEDIA_PAUSE — отдельные, MEDIA_NEXT).
+  function clickMedia(cmd) {
+    if (!api.isHost && window.stubPlayer) {
+      if (cmd === 'MEDIA_PREV')        return window.stubPlayer.prev();
+      if (cmd === 'MEDIA_NEXT')        return window.stubPlayer.next();
+      if (cmd === 'MEDIA_PLAY_PAUSE')  return window.stubPlayer.toggle();
+    }
+    // ГУ: PLAY_PAUSE собирается из PlayStat, остальные шлём как есть.
+    if (cmd === 'MEDIA_PLAY_PAUSE') {
+      api.runEnum(lastPlayStat === 'play' ? 'MEDIA_PAUSE' : 'MEDIA_PLAY');
+      return;
+    }
+    api.runEnum(cmd);
+  }
+
   document.querySelectorAll('.btn-media').forEach((btn) => {
     btn.addEventListener('click', () => {
       const cmd = btn.dataset.cmd;
-      if (cmd) api.runEnum(cmd);
+      if (cmd) clickMedia(cmd);
     });
   });
 
-  // Volume ±5 шагами. JCarTools API: getvol/setvol (0..100).
-  const VOL_STEP = 5;
+  // Громкость — всегда через JCT (Volume_Up/Volume_Down из манифеста). ГУ сам
+  // знает свой шаг и текущий уровень. В stub-режиме runEnum пишет в console и
+  // обновляет stubState.volume через applyStubEnum.
   document.querySelectorAll('.btn-vol').forEach((btn) => {
     btn.addEventListener('click', () => {
-      const cur = api.getVolume();
-      const next = btn.dataset.vol === 'up'
-        ? Math.min(100, cur + VOL_STEP)
-        : Math.max(0,   cur - VOL_STEP);
-      api.setVolume(next);
+      api.runEnum(btn.dataset.vol === 'up' ? 'Volume_Up' : 'Volume_Down');
     });
   });
 

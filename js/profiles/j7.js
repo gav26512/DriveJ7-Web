@@ -10,6 +10,9 @@
     id: 'j7',
     name: 'Jaecoo J7',
     bodyClass: 'profile-j7',
+    // Разрешение экрана ГУ Jaecoo J7: 1440×1670 dp (portrait).
+    // Источник: MainActivity.kt:3864-3865 @Preview из нативного DriveJ7.
+    screenSize: { width: 1440, height: 1670 },
     // По решению юзера: fuel/coolant виджеты не делаем.
     fuelTankLiters: null,
     hvac: {
