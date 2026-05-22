@@ -46,7 +46,8 @@
         </div>
         <div class="player-controls">
           <button class="btn-vol" data-vol="down" aria-label="vol-">🔉</button>
-          <button class="btn-media" data-cmd="MEDIA_PREV" aria-label="prev">⏮</button>
+          <!-- ⏮ → MEDIA_BLACK: на DesaySV-сборке JCT это enum «Медиа предыдущий трек» (см. JCT_API.md). -->
+          <button class="btn-media" data-cmd="MEDIA_BLACK" aria-label="prev">⏮</button>
           <button class="btn-media btn-media-play" data-cmd="MEDIA_PLAY_PAUSE" aria-label="play/pause">▶</button>
           <button class="btn-media" data-cmd="MEDIA_NEXT" aria-label="next">⏭</button>
           <button class="btn-vol" data-vol="up" aria-label="vol+">🔊</button>
@@ -240,8 +241,44 @@
         <label for="cfg-mem3">В3</label>
         <input type="checkbox" id="cfg-mem3" checked>
       </div>
+      <div class="settings-section" data-i18n="settings.sec_diag">Диагностика JCT</div>
+      <div class="settings-row settings-row-col">
+        <div class="diag-actions">
+          <button id="diag-refresh" class="diag-btn">Обновить</button>
+          <button id="diag-copy" class="diag-btn">Скопировать всё</button>
+        </div>
+        <div class="diag-block">
+          <div class="diag-label">api.getRunEnum() — доступные команды:</div>
+          <pre id="diag-enums" class="diag-pre">—</pre>
+        </div>
+        <div class="diag-block">
+          <div class="diag-label">api.getCarData('all') — данные машины:</div>
+          <pre id="diag-car" class="diag-pre">—</pre>
+        </div>
+        <div class="diag-block">
+          <div class="diag-label">api.getUserApps() — установленные приложения:</div>
+          <pre id="diag-apps" class="diag-pre">—</pre>
+        </div>
+        <div class="diag-block">
+          <div class="diag-label">События onAndroidEvent (последние 50, live):</div>
+          <pre id="diag-events" class="diag-pre">—</pre>
+        </div>
+        <div class="diag-block">
+          <div class="diag-label">window.androidApi — все методы:</div>
+          <pre id="diag-methods" class="diag-pre">—</pre>
+        </div>
+        <div class="diag-block">
+          <div class="diag-label">Проба новых методов (getAppInfo / playerInfo):</div>
+          <pre id="diag-probe" class="diag-pre">—</pre>
+        </div>
+        <div class="diag-block">
+          <div class="diag-label">isHost / TOKEN:</div>
+          <pre id="diag-meta" class="diag-pre">—</pre>
+        </div>
+      </div>
+
       <div class="settings-row about" data-i18n="settings.about">О приложении</div>
-      <div class="about-text">Drive J7 web · v0.3.1 · gav26512/DriveJ7-Web</div>
+      <div class="about-text">Drive J7 web · v0.3.6 · gav26512/DriveJ7-Web</div>
     </div>
   </div>
 

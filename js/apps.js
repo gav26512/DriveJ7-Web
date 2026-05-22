@@ -17,6 +17,27 @@
   let slots = loadSlots();
   let activeSlotIdx = -1;
 
+  /**
+   * Иконка приложения в JCT может приходить под разными именами и в разных
+   * форматах: url, data: URL или голый base64. Перебираем кандидатов и
+   * нормализуем в CSS-валидный URL.
+   */
+  function normalizeAppIcon(app) {
+    const raw = app?.icon || app?.iconBase64 || app?.image || app?.pic || app?.appIcon || '';
+    if (!raw || typeof raw !== 'string') return '';
+    if (raw.startsWith('http') || raw.startsWith('data:')) return raw;
+    if (/^[A-Za-z0-9+/=]+$/.test(raw.slice(0, 64))) {
+      return `data:image/png;base64,${raw}`;
+    }
+    return raw;
+  }
+
+  /** Label приложения: проверяем разные имена полей, fallback — короткое имя пакета. */
+  function appLabel(app) {
+    return app?.label || app?.name || app?.appName || app?.title ||
+           (app?.package ? app.package.split('.').pop() : '?');
+  }
+
   function loadSlots() {
     try {
       const raw = localStorage.getItem(STORAGE_KEY);
@@ -43,17 +64,18 @@
 
       const icon = document.createElement('div');
       icon.className = 'app-slot-icon';
-      if (slot?.icon) {
-        icon.style.backgroundImage = `url(${slot.icon})`;
-      } else if (slot?.label) {
-        icon.textContent = slot.label.charAt(0).toUpperCase();
+      const slotIconUrl = slot ? normalizeAppIcon(slot) : '';
+      if (slotIconUrl) {
+        icon.style.backgroundImage = `url("${slotIconUrl}")`;
+      } else if (slot) {
+        icon.textContent = appLabel(slot).charAt(0).toUpperCase();
       } else {
         icon.textContent = '+';
       }
 
       const label = document.createElement('div');
       label.className = 'app-slot-label';
-      label.textContent = slot?.label || i18n.t('apps.add');
+      label.textContent = slot ? appLabel(slot) : i18n.t('apps.add');
 
       div.appendChild(icon);
       div.appendChild(label);
@@ -93,18 +115,21 @@
         item.className = 'app-picker-item';
         const icon = document.createElement('div');
         icon.className = 'picker-icon';
-        if (app.icon) {
-          icon.style.backgroundImage = `url(${app.icon})`;
+        const iconUrl = normalizeAppIcon(app);
+        const niceLabel = appLabel(app);
+        if (iconUrl) {
+          icon.style.backgroundImage = `url("${iconUrl}")`;
         } else {
-          icon.textContent = (app.label || '?').charAt(0).toUpperCase();
+          icon.textContent = niceLabel.charAt(0).toUpperCase();
         }
         const label = document.createElement('div');
         label.className = 'picker-label';
-        label.textContent = app.label || app.package;
+        label.textContent = niceLabel;
         item.appendChild(icon);
         item.appendChild(label);
         item.addEventListener('click', () => {
-          slots[activeSlotIdx] = { package: app.package, label: app.label, icon: app.icon };
+          // В slot кладём весь объект — нормализация будет при ренденре.
+          slots[activeSlotIdx] = { ...app, label: niceLabel };
           saveSlots();
           renderGrid();
           closePicker();

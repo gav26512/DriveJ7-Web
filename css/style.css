@@ -276,6 +276,11 @@ img {
   color: var(--text-dim);
 }
 
+/* Когда плеер получил обложку — прячем ♪-плейсхолдер. */
+.player-art.has-art .player-art-placeholder {
+  display: none;
+}
+
 .player-info {
   grid-area: info;
   min-width: 0;
@@ -884,6 +889,58 @@ body.profile-tiggo9 .hvac-btn.active { background: rgba(255, 154, 77, 0.10); }
   font-size: 11px;
   color: var(--text-dim);
   text-align: center;
+}
+
+/* ============================== Diagnostics block (Settings) */
+.diag-actions {
+  display: flex;
+  gap: 8px;
+  width: 100%;
+}
+
+.diag-btn {
+  flex: 1;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 8px 12px;
+  font-size: 13px;
+  color: var(--text);
+  cursor: pointer;
+}
+
+.diag-btn:active {
+  background: var(--surface-active);
+}
+
+.diag-block {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.diag-label {
+  font-size: 11px;
+  color: var(--text-dim);
+  letter-spacing: 0.3px;
+}
+
+.diag-pre {
+  background: rgba(0, 0, 0, 0.45);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 8px 10px;
+  font-family: 'SF Mono', 'Monaco', 'Cascadia Code', 'Consolas', monospace;
+  font-size: 11px;
+  line-height: 1.4;
+  color: var(--text);
+  max-height: 220px;
+  overflow: auto;
+  white-space: pre-wrap;
+  word-break: break-all;
+  -webkit-user-select: text;
+  user-select: text;
 }
 
 .app-picker-list {

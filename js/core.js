@@ -15,11 +15,10 @@
   });
 
   // Уведомить хост о готовности — после этого начнут приходить события.
-  // Делаем небольшую задержку чтобы все модули успели подписаться.
-  setTimeout(() => {
-    api.onJsReady();
-    console.info('[core] onJsReady fired, profile:', window.profile?.id);
-  }, 50);
+  // Все js-модули загружены синхронно ДО core.js (см. порядок <script> в index.html),
+  // подписки уже выставлены, поэтому ждать taймаут не нужно.
+  api.onJsReady();
+  console.info('[core] onJsReady fired, profile:', window.profile?.id);
 
   // Auto-launch выбранного плеера через 1.5 сек после старта — даёт хосту время
   // прислать musicInfo с уже играющим треком (если что-то уже играет).

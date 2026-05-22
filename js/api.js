@@ -381,8 +381,16 @@
 
   const bus = new EventTarget();
 
+  // Ring buffer последних событий — для диагностического оверлея в Settings.
+  // Не используется в обычной работе, нужен только чтобы юзер на ГУ мог увидеть
+  // какие события и под какими именами шлёт его билд JCT.
+  const recentEvents = [];
+  const RECENT_MAX = 50;
+
   window.onAndroidEvent = function(type, data) {
     if (!type) return;
+    recentEvents.push({ type, data, t: Date.now() });
+    if (recentEvents.length > RECENT_MAX) recentEvents.shift();
     bus.dispatchEvent(new CustomEvent(type, { detail: data }));
   };
 
@@ -394,6 +402,11 @@
 
   // ============================== Export ==============================
 
+  /** Снимок последних N событий — для диагностики. */
+  function getRecentEvents() {
+    return recentEvents.slice();
+  }
+
   window.api = {
     isHost,
     TOKEN,
@@ -401,6 +414,6 @@
     getCarData, getUserApps, runApp,
     getRunEnum, runEnum,
     getVolume, setVolume, setBrightness,
-    on,
+    on, getRecentEvents,
   };
 })();

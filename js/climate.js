@@ -4,7 +4,6 @@
 // Кнопки рендерятся ИЗ JS (не хардкодом в HTML) — это позволяет:
 //   - drag-n-drop перестановку с сохранением порядка в localStorage 'hvac-order'
 //   - перекрашивание иконок через CSS mask-image (icon одного цвета с border)
-//   - условный disable если команда не в getRunEnum()
 
 (() => {
   // ============================== BUTTONS: декларация всех 12 HVAC кнопок
@@ -32,7 +31,7 @@
     { id: 'steering_heat', type: 'toggle', stateKey: 'steering_heat', icon: 'steer',         cmd: { on: 'heat_wheel_on',     off: 'heat_wheel_off' },     title: 'Подогрев руля' },
     { id: 'seat_drv',      type: 'level',  stateKey: 'seats.drv',     icon: 'seat_heat_drv', cmd: { base: 'heat_seat_l',     off: 'heat_seat_l_0' },     title: 'Подогрев водителя' },
     { id: 'seat_pass',     type: 'level',  stateKey: 'seats.pass',    icon: 'seat_heat_pass',cmd: { base: 'heat_seat_r',     off: 'heat_seat_r_0' },     title: 'Подогрев пассажира' },
-    { id: 'seat_rl',       type: 'level',  stateKey: 'seats.rl',      icon: 'seat_heat_drv', cmd: { base: 'heat_zad_seat_l', off: 'heat_zad_seat_l_0' }, title: 'Подогрев заднего левого', badge: 'З' },
+    { id: 'seat_rl',       type: 'level',  stateKey: 'seats.rl',      icon: 'seat_heat_drv', cmd: { base: 'heat_zad_seat_l', off: 'heat_zad_seat_l_off' }, title: 'Подогрев заднего левого', badge: 'З' },
     { id: 'seat_rr',       type: 'level',  stateKey: 'seats.rr',      icon: 'seat_heat_pass',cmd: { base: 'heat_zad_seat_r', off: 'heat_zad_seat_r_off' }, title: 'Подогрев заднего правого', badge: 'З' },
     { id: 'vent_drv',      type: 'level',  stateKey: 'vents.drv',     icon: 'seat_vent_drv', cmd: { base: 'vent_seat_l',     off: 'vent_seat_l_0' },     title: 'Обдув водителя' },
     { id: 'vent_pass',     type: 'level',  stateKey: 'vents.pass',    icon: 'seat_vent_pass',cmd: { base: 'vent_seat_r',     off: 'vent_seat_r_0' },     title: 'Обдув пассажира' },
@@ -83,19 +82,13 @@
     obj[parts[parts.length - 1]] = value;
   }
 
-  // ============================== Available cmds
-  let availableCmds = new Set();
-  function loadAvailable() {
-    const enums = api.getRunEnum();
-    availableCmds = new Set(Array.isArray(enums) ? enums : []);
-  }
-
+  // ============================== Send cmd
+  // Гейтинг по api.getRunEnum() снят: команда всегда уходит через JCT. На разных
+  // сборках JCT список из getRunEnum может быть неполным даже если сам runEnum
+  // имя поддерживает — JCT сам решит что делать с командой. Pre-check на
+  // JS-стороне только маскировал реальную работу кнопок.
   function runIfAvailable(cmdName) {
     if (!cmdName) return;
-    if (availableCmds.size > 0 && !availableCmds.has(cmdName)) {
-      console.warn(`[climate] ${cmdName} not available`);
-      return;
-    }
     api.runEnum(cmdName);
   }
 
@@ -185,23 +178,11 @@
       for (let i = 0; i < 3; i++) dots.appendChild(document.createElement('span'));
       btn.appendChild(dots);
     }
-    // Дизейбл если ни одна из cmd-вариаций кнопки не в availableCmds.
-    // В browser stub режиме (api.isHost=false) НЕ дизейблим — stub возвращает
-    // ограниченный список, реальный хост даст полный набор.
-    if (api.isHost && availableCmds.size > 0 && def.cmd) {
-      const allCmds = def.type === 'toggle'
-        ? [def.cmd.on, def.cmd.off]
-        : [def.cmd.off, `${def.cmd.base}_1`, `${def.cmd.base}_2`, `${def.cmd.base}_3`];
-      if (!allCmds.some((c) => availableCmds.has(c))) {
-        btn.classList.add('disabled');
-      }
-    }
     btn.addEventListener('click', () => onClick(def, btn));
     return btn;
   }
 
   function onClick(def, btn) {
-    if (btn.classList.contains('disabled')) return;
     let newValue;
     if (def.type === 'toggle') {
       const cur = readState(def.stateKey);
@@ -364,7 +345,6 @@
   // HVAC приемлемо. Если хост в будущем начнёт слать climateState — добавим подписку.
 
   // ============================== Init
-  loadAvailable();
   renderGrid();
   syncFromCarData();
   setInterval(syncFromCarData, 1000);

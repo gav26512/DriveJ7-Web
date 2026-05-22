@@ -17,8 +17,32 @@
     return `${m}:${String(s).padStart(2, '0')}`;
   }
 
-  // Запоминаем последний PlayStat — нужен для кнопки play/pause: в JCT нет enum'а
-  // MEDIA_PLAY_PAUSE (одной кнопкой), есть отдельные MEDIA_PLAY и MEDIA_PAUSE.
+  /**
+   * DesaySV-сборка JCT отдаёт Trpos/Trdur в миллисекундах вопреки манифесту
+   * («в секундах»). Эвристика: если значение > 10000 — это явно не секунды
+   * (трек длиннее 2.7 часов крайне маловероятен), делим на 1000.
+   */
+  function parseTime(v) {
+    const n = Number(v) || 0;
+    return n > 10000 ? n / 1000 : n;
+  }
+
+  /**
+   * SongAlbumPicture может приходить как (a) полный URL, (b) data: URL,
+   * (c) сырой base64 без префикса. Нормализуем в формат, который ест CSS.
+   */
+  function normalizeArt(v) {
+    if (!v || typeof v !== 'string') return '';
+    if (v.startsWith('http') || v.startsWith('data:')) return v;
+    // Похоже на base64 (только b64-символы) — оборачиваем в data URL.
+    if (/^[A-Za-z0-9+/=]+$/.test(v.slice(0, 64))) {
+      return `data:image/jpeg;base64,${v}`;
+    }
+    return v;
+  }
+
+  // PlayStat нужен для логики кнопки play/pause: в JCT_API нет единого toggle-enum'а
+  // (MEDIA_PLAY_PAUSE отсутствует), есть только раздельные MEDIA_PLAY и MEDIA_PAUSE.
   let lastPlayStat = 'pause';
 
   function render(info) {
@@ -33,13 +57,18 @@
     }
     titleEl.textContent = info.SongName || i18n.t('music.no_track');
     artistEl.textContent = info.SongArtist || i18n.t('music.unknown_artist');
-    if (info.SongAlbumPicture) {
-      artEl.style.backgroundImage = `url(${info.SongAlbumPicture})`;
+
+    const art = normalizeArt(info.SongAlbumPicture || info.SongPic || info.AlbumArt || '');
+    if (art) {
+      artEl.style.backgroundImage = `url("${art}")`;
+      artEl.classList.add('has-art');
     } else {
       artEl.style.backgroundImage = '';
+      artEl.classList.remove('has-art');
     }
-    const pos = Number(info.Trpos) || 0;
-    const dur = Number(info.Trdur) || 0;
+
+    const pos = parseTime(info.Trpos);
+    const dur = parseTime(info.Trdur);
     posEl.textContent = fmtTime(pos);
     durEl.textContent = fmtTime(dur);
     barEl.style.width = dur > 0 ? `${Math.min(100, (pos / dur) * 100)}%` : '0%';
@@ -49,16 +78,16 @@
     if (playBtn) playBtn.textContent = lastPlayStat === 'play' ? '⏸' : '▶';
   }
 
-  // Кнопки plr-управления: в browser-stub режиме (!api.isHost) — переключаем
-  // stubPlayer локально, чтобы UI работал без JCT. На ГУ — runEnum (JCT enum'ы:
-  // MEDIA_PREV — нет в манифесте, MEDIA_PLAY/MEDIA_PAUSE — отдельные, MEDIA_NEXT).
+  // Кнопки plr-управления. На ГУ — прямой api.runEnum с именами из JCT_API.md.
+  // В browser-stub режиме (!api.isHost) — переключаем stubPlayer локально, чтобы
+  // UI работал без JCT-хоста.
   function clickMedia(cmd) {
     if (!api.isHost && window.stubPlayer) {
-      if (cmd === 'MEDIA_PREV')        return window.stubPlayer.prev();
+      if (cmd === 'MEDIA_BLACK')       return window.stubPlayer.prev();
       if (cmd === 'MEDIA_NEXT')        return window.stubPlayer.next();
       if (cmd === 'MEDIA_PLAY_PAUSE')  return window.stubPlayer.toggle();
     }
-    // ГУ: PLAY_PAUSE собирается из PlayStat, остальные шлём как есть.
+    // PLAY_PAUSE собираем сами — единого toggle-enum'а в JCT нет.
     if (cmd === 'MEDIA_PLAY_PAUSE') {
       api.runEnum(lastPlayStat === 'play' ? 'MEDIA_PAUSE' : 'MEDIA_PLAY');
       return;
@@ -73,12 +102,17 @@
     });
   });
 
-  // Громкость — всегда через JCT (Volume_Up/Volume_Down из манифеста). ГУ сам
-  // знает свой шаг и текущий уровень. В stub-режиме runEnum пишет в console и
-  // обновляет stubState.volume через applyStubEnum.
+  // Громкость — через прямые setvol/getvol (нативные методы JCT, не runEnum).
+  // Volume_Up/Volume_Down через runEnum на DesaySV не отрабатывают, а setvol —
+  // обычный JCT-метод и должен работать на всех билдах.
+  const VOL_STEP = 5;
   document.querySelectorAll('.btn-vol').forEach((btn) => {
     btn.addEventListener('click', () => {
-      api.runEnum(btn.dataset.vol === 'up' ? 'Volume_Up' : 'Volume_Down');
+      const cur = api.getVolume();
+      const next = btn.dataset.vol === 'up'
+        ? Math.min(100, cur + VOL_STEP)
+        : Math.max(0,   cur - VOL_STEP);
+      api.setVolume(next);
     });
   });
 
